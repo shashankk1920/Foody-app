@@ -9,10 +9,10 @@ const ResetPassword= () => {
   const loading = false;
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full">
-      <form className="flex flex-col gap-5 md:p-8 w-full max-w-md rounded-lg">
+    <div className="flex items-center justify-center min-h-screen w-full bg-[#f7f1e8b4] ">
+      <form className="flex flex-col gap-5 md:p-8 w-full max-w-md rounded-lg md:border border-gray-300 ">
         <div className="text-center">
-          <h1 className="font-extrabold text-2xl mb-2">Reset Password</h1>
+          <h1 className="font-extrabold text-2xl mb-2 hover:text-hoverOrange h transition duration-300 ease-in-ou">Reset Password</h1>
           <p className="text-sm text-gray-600">Enter your new password to reset old one</p>
         </div>
         <div className="relative">

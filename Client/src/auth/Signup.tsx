@@ -45,13 +45,13 @@ const Signup = () => {
   };
   const loading = false;
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-[#f7f1e8b4]">
       <form
         onSubmit={loginSubmitHandler}
-        className="md:p-8 w-full max-w-md rounded-lg md:border border-gray-200 "
+        className="md:p-8 w-full max-w-md rounded-lg md:border border-gray-200 bg-slate-50 "
       >
         <div className="mb-5">
-          <h1 className="font-bold text-2xl">FoodyPlace</h1>
+          <h1 className="font-bold text-2xl text-center">FoodyPlace</h1>
         </div>
         <div className="mb-5">
          
@@ -138,7 +138,7 @@ const Signup = () => {
           )}
         </div>
         <Separator />
-        <p className="mt-2">
+        <p className="mt-2 text-center">
           Already have an account ?
           <Link to="/login" className="text-blue-500 ml-1 hover:underline">
             Login
