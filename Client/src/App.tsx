@@ -1,6 +1,6 @@
 // import "./App.css";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 
 import Signup from "./auth/Signup.tsx";
 import Login from "./auth/Login.tsx";
@@ -13,17 +13,52 @@ import MainLayout from "./layout/MainLayout.tsx";
 import Profile from "./components/Profile.tsx";
 import SearchPage from "./components/SearchPage.tsx";
 import ResturantDetails from "./components/ResturantDetails.tsx";
-import { CarTaxiFront } from "lucide-react";
+
 import Cart from "./components/Cart.tsx";
 import Restaurant from "./admin/Restaurant.tsx";
 import AddMenu from "./admin/AddMenu.tsx";
 import Order from "./admin/Order.tsx";
 import Succcess from "./components/Succcess.tsx";
+import { useUserStore } from "./store/useUserStore.ts";
+import { useEffect } from "react";
+import Loading from "./components/ui/Loading.tsx";
+
+const ProtectedRoutes = ({children}:{children:React.ReactNode} )=>{
+  const {isAuthenticated, user} = useUserStore ();
+  if(!isAuthenticated){
+    return <Navigate to="/login" replace/>
+  }
+  if(!user?.isVerified){
+    return <Navigate to="/verify-email" replace/>
+  }
+  return children;
+}
+
+const AuthenticatedUser = ({children}:{children:React.ReactNode}) =>{
+  const { isAuthenticated, user} = useUserStore();
+  if(isAuthenticated && user?.isVerified){
+    return <Navigate to = "/" replace/>
+  }
+  return children;
+};
+
+const AdminRoute = ({children}:{children:React.ReactNode}) =>{
+  const {user, isAuthenticated} = useUserStore();
+
+  if(!isAuthenticated){
+    return<Navigate to="/login" replace/>
+
+  }
+  if(user?.admin){
+    return <Navigate to="/" replace/>
+  }
+  return children;
+}
 
 const appRouter = createBrowserRouter([
   {
     path:"/",
-    element:<MainLayout/>,
+    element:<ProtectedRoutes><MainLayout/></ProtectedRoutes>,
     children:[
       {
         path:"/",
@@ -52,42 +87,50 @@ const appRouter = createBrowserRouter([
       //From here admin services are also started so a user can become a admin and add or remove or remove a restaurant
       {
         path:"/admin/restaurant",
-        element:<Restaurant/>,
+        element:<AdminRoute><Restaurant/></AdminRoute>,
       },
       {
         path:"/admin/menu",
-        element:<AddMenu/>,
+        element:<AdminRoute><AddMenu/></AdminRoute>,
       },
       {
         path:"/admin/orders",
-        element:<Order/>,
+        element:<AdminRoute><Order/></AdminRoute>,
       },
     ]
   },
     {
       path:"/login",
-      element:<Login/>
+      element:<AuthenticatedUser><Login/></AuthenticatedUser>
     },
     {
       path:"/signup",
-      element:<Signup/>
+      element:  <AuthenticatedUser><Signup/></AuthenticatedUser>
     },
     {
       path:"/forgot-password",
-      element:<ForgotPassword/>
+      element:<AuthenticatedUser><ForgotPassword/></AuthenticatedUser>
     },
     {
       path:"/reset-password",
       element:<ResetPassword/>
     },
     {
-      path:"/verify-password",
+      path:"/verify-email",
       element:<VerifyEmail/>
     }
   
 ])
 
 function App() {
+  const { checkAuthentication, isCheckingAuth } = useUserStore();
+  // checking auth every time when page is loaded
+  useEffect(() => {
+    checkAuthentication();
+  }, [checkAuthentication]);
+  
+  if (isCheckingAuth) return <Loading />;
+  
   return (
     <>
     <RouterProvider router={appRouter}/>

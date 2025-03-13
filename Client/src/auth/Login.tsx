@@ -5,6 +5,7 @@ import { Separator } from "@radix-ui/react-separator";
 import { Link } from "react-router-dom";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { LoginInputState, userLoginSchema } from "../schema/userSchema";
+import { useUserStore } from "../store/useUserStore";
 
 const Login = () => { 
   const [input, setInput] = useState<LoginInputState>({
@@ -13,13 +14,14 @@ const Login = () => {
   });
 
   const [error, setErrors] = useState<Partial<LoginInputState>>({});
+  const{loading, login} = useUserStore();
 
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value }); 
   }
 
-  const loginSubmitHandler = (e: FormEvent) => {
+  const loginSubmitHandler = async (e: FormEvent) => {
     e.preventDefault();
     const result = userLoginSchema.safeParse(input);
     if (!result.success) {
@@ -28,9 +30,10 @@ const Login = () => {
       return;
     }
     console.log(input);
+    await login(input);
   }
 
-  const loading = false;
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#f7f1e8b4] "> {/* Added bg-gray-100 for background color */}

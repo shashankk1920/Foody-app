@@ -28,16 +28,22 @@ import {
   SheetTrigger,
 } from "./sheet";
 import { Separator } from "@radix-ui/react-separator";
+import { useUserStore } from "../../store/useUserStore";
+
+
+
 
 const NavBar = () => {
+  const {user, loading} = useUserStore();
   const admin = true;
   const loading = false;
+
 
   return (
     <div className="max-w-7xl mx-auto flex items-center justify-between h-14 px-4  ">
       <div className="flex-1 hidden md:block">
         <Link to="/" className="font-bold md:font-extrabold text-2xl">
-          Foody
+         <h1 className="font-bold md:font-extrabold text-2xl">Foody </h1> 
         </Link>
       </div>
       <div className="hidden md:flex items-center gap-6 p-14">
@@ -60,7 +66,7 @@ const NavBar = () => {
           Profile
           <User className="w-4 h-4" />
         </Link>
-        {admin && (
+        {user?.admin && (
           <Menubar>
             <MenubarMenu>
               <MenubarTrigger className="cursor-pointer hover:text-hoverOrange transition duration-300 ease-in-out">
