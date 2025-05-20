@@ -34,9 +34,8 @@ import { useUserStore } from "../../store/useUserStore";
 
 
 const NavBar = () => {
-  const {user, loading} = useUserStore();
-  const admin = true;
-  const loading = false;
+ const {user, loading, logout} = useUserStore();
+  
 
 
   return (
@@ -118,9 +117,10 @@ const NavBar = () => {
           {loading ? (
             <Button disabled className="bg-orange hover:bg-hoverOrange">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              PLease Wait
             </Button>
           ) : (
-            <Button className=" max-w-sm  bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 focus:outline-none text-white rounded-md mx-auto p-5d outline-none shadow-lg transform active:scale-x-75 transition-transform  flex">Logout</Button>
+            <Button onClick={logout} className=" max-w-sm  bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 focus:outline-none text-white rounded-md mx-auto p-5d outline-none shadow-lg transform active:scale-x-75 transition-transform  flex">Logout</Button>
           )}
         </div>
       </div>
@@ -137,7 +137,9 @@ const NavBar = () => {
 export default NavBar;
 
 const MobileNavbar = () => {
-  
+   const {user, loading, logout} = useUserStore();
+   
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -178,7 +180,10 @@ const MobileNavbar = () => {
           <ShoppingCart/>
           <span>Cart(0)</span>
           </Link>
-          <Link to="/admin/menu" className="flex item-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font">
+         {
+          user?.admin && (
+            <>
+               <Link to="/admin/menu" className="flex item-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font">
           <SquareMenu/>
           <span>Menu</span>
           </Link>
@@ -190,6 +195,10 @@ const MobileNavbar = () => {
           <PackageCheck/>
           <span>Resturant Order</span>
           </Link>
+            </>
+          )
+         }
+       
         </SheetDescription>
         <SheetFooter className="flex flex-col item-center gap-4">
 
@@ -207,7 +216,15 @@ const MobileNavbar = () => {
     </>
  
     <SheetClose asChild>
-    <Button type="submit" className="bg-orange hover:bg-hoverOrange">Logout</Button>
+      
+    {loading ? (
+            <Button disabled className="bg-orange hover:bg-hoverOrange">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              PLease Wait
+            </Button>
+          ) : (
+            <Button onClick={logout} className=" max-w-sm  bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 focus:outline-none text-white rounded-md mx-auto p-5d outline-none shadow-lg transform active:scale-x-75 transition-transform  flex">Logout</Button>
+          )}
   </SheetClose>
   
          

@@ -23,42 +23,45 @@ import { useUserStore } from "./store/useUserStore.ts";
 import { useEffect } from "react";
 import Loading from "./components/ui/Loading.tsx";
 
-const ProtectedRoutes = ({children}:{children:React.ReactNode} )=>{
-  const {isAuthenticated, user} = useUserStore ();
-  if(!isAuthenticated){
-    return <Navigate to="/login" replace/>
+const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, user } = useUserStore();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
-  if(!user?.isVerified){
-    return <Navigate to="/verify-email" replace/>
-  }
-  return children;
-}
 
-const AuthenticatedUser = ({children}:{children:React.ReactNode}) =>{
-  const { isAuthenticated, user} = useUserStore();
-  if(isAuthenticated && user?.isVerified){
-    return <Navigate to = "/" replace/>
+  if (!user?.isVerified) {
+    return <Navigate to="/verify-email" replace />;
   }
   return children;
 };
 
-const AdminRoute = ({children}:{children:React.ReactNode}) =>{
-  const {user, isAuthenticated} = useUserStore();
-
-  if(!isAuthenticated){
-    return<Navigate to="/login" replace/>
-
-  }
-  if(user?.admin){
+const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, user } = useUserStore();
+  if(isAuthenticated && user?.isVerified){
     return <Navigate to="/" replace/>
   }
+  return children;
+};
+
+const AdminRoute = ({children}:{children:React.ReactNode}) => {
+  const {user, isAuthenticated} = useUserStore();
+  if(!isAuthenticated){
+    return <Navigate to="/login" replace/>
+  }
+  if(!user?.admin){
+    return <Navigate to="/" replace/>
+  }
+
   return children;
 }
 
 const appRouter = createBrowserRouter([
   {
     path:"/",
-    element:<ProtectedRoutes><MainLayout/></ProtectedRoutes>,
+     element:<ProtectedRoutes><MainLayout/></ProtectedRoutes>,
+    // element:<MainLayout/>,
+   
+
     children:[
       {
         path:"/",
@@ -132,13 +135,11 @@ function App() {
   if (isCheckingAuth) return <Loading />;
   
   return (
-    <>
-    <RouterProvider router={appRouter}/>
-
- 
-    
-</>
+    <main>
+      <RouterProvider router={appRouter}></RouterProvider>
+    </main>
   );
 }
+
 
 export default App;

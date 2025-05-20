@@ -4,6 +4,10 @@ import { Button } from "../components/ui/button";
 import { Loader2 } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { RestaurantFormSchema, restaurantFromSchema } from "../schema/restaurantSchema";
+import { useRestaurantStore } from "../store/useRestaurantStore";
+import { useEffect } from "react";
+
+
 
 interface InputState {
   restaurantName: string;
@@ -25,6 +29,10 @@ const Restaurant = () => {
   });
 
   const [error, setError] = useState<Partial<RestaurantFormSchema>>({});
+  const{loading, createRestaurant, restaurant,  updateRestaurant, getRestaurant
+  } =
+   useRestaurantStore()
+
 
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, files } = e.target;
@@ -37,7 +45,7 @@ const Restaurant = () => {
     }
   };
 
-  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Submitting form with input:", input); 
     const result = restaurantFromSchema.safeParse(input);
@@ -48,12 +56,51 @@ const Restaurant = () => {
       return;
     }
     // add restaurant API implementation start from here
-    console.log("Form submitted successfully with input:", input);
+    try {
+      const formData = new FormData();
+      formData.append("restaurantName", input.restaurantName);
+      formData.append("city", input.city);
+      formData.append("country", input.country);
+      formData.append("deliveryTime", input.deliveryTime.toString());
+      formData.append("cuisines", JSON.stringify(input.cuisines));
+
+      if (input.imageFile) {
+        formData.append("imageFile", input.imageFile);
+      }
+
+      if (restaurant) {
+        // update
+        await updateRestaurant(formData);
+      } else {
+        // create
+        await createRestaurant(formData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const loading = false;
-  const restaurantHai1 = false;
-
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      await getRestaurant();
+      if(restaurant){
+        setInput({
+          restaurantName: restaurant.restaurantName || "",
+          city: restaurant.city || "",
+          country: restaurant.country || "",
+          deliveryTime: restaurant.deliveryTime || 0,
+          cuisines: restaurant.cuisines
+            ? restaurant.cuisines.map((cuisine: string) => cuisine)
+            : [],
+          imageFile: undefined,
+        });
+      };
+      }
+    fetchRestaurant();
+    console.log(restaurant);
+    
+  }, []);
+  
   return (
     <div className="max-w-6xl mx-auto my-10 p-6 bg-white rounded-md shadow-md">
       <h1 className="font-extrabold text-2xl mb-5 text-center">Add Restaurant</h1>
@@ -102,6 +149,7 @@ const Restaurant = () => {
           <div className="flex flex-col">
             <Label className="mb-2">Delivery Time</Label>
             <Input
+            min={0}
               type="number"
               name="deliveryTime"
               value={input.deliveryTime}
@@ -144,9 +192,12 @@ const Restaurant = () => {
               Please Wait
             </Button>
           ) : (
-            <Button type="submit" className="bg-orange hover:bg-hoverOrange px-6 py-2">
-              {restaurantHai1 ? "Update your Restaurant" : "Add New Restaurant"}
-            </Button>
+            <Button className="bg-orange hover:bg-hoverOrange">
+                  {restaurant
+                    ? "Update Your Restaurant"
+                    : "Add Your Restaurant"}
+                </Button>
+
           )}
         </div>
       </form>
@@ -155,3 +206,4 @@ const Restaurant = () => {
 };
 
 export default Restaurant;
+   

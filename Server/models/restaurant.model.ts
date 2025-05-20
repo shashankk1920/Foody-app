@@ -18,7 +18,7 @@ export interface IRestaurantDocument extends IRestaurant, Document {
 }
 
 
-const resturantSchema = new mongoose.Schema<IRestaurantDocument>({
+const restaurantSchema = new mongoose.Schema<IRestaurantDocument>({
       user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
@@ -52,4 +52,4 @@ const resturantSchema = new mongoose.Schema<IRestaurantDocument>({
         
      
 },{timestamps:true});
-export const Restaurant = mongoose.model("Restaurant", resturantSchema ); 
+export const Restaurant = mongoose.model("Restaurant", restaurantSchema ); 

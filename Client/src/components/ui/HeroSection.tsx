@@ -9,6 +9,7 @@ const HeroSection = () => {
   const [searchText, setSearchText] = useState<string>("");
   const navigate = useNavigate();
 
+  
   return (
     <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-4 md:p-10 rounded-lg items-center justify-between gap-10 h-screen ">
       <div className="flex flex-col gap-5 md:w-[50%] ml-7 ">
@@ -27,7 +28,7 @@ const HeroSection = () => {
             className="pl-10 h-10 shadow-lg text-xl "
           />
           <Search className="text-gray-500 absolute inset-y-2 left-2" />
-          <Button onClick={() => navigate("/search/${search}") } className="max-w-sm  bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 focus:outline-none text-white    rounded-md mx-auto p-5d outline-none shadow-lg transform active:scale-x-75 transition-transform  flex">
+          <Button onClick={() => navigate(`/search/${searchText}`)} className="max-w-sm  bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 focus:outline-none text-white    rounded-md mx-auto p-5d outline-none shadow-lg transform active:scale-x-75 transition-transform  flex">
             Search
           </Button>
         </div>

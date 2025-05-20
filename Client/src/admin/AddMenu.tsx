@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,30 +14,30 @@ import { Input } from "../components/ui/input";
 import { Loader2, Plus } from "lucide-react";
 import EditMenu from "./EditMenu";
 import { MenuFormSchema, menuSchema } from "../schema/menuSchema";
+import { useMenuStore } from "../store/useMenuStore";
+import { useRestaurantStore } from "../store/useRestaurantStore";
 
-const menu = [
-  {
-    name: "Burger", // Changed 'title' to 'name'
-    description: "Juicy beef patty, fresh lettuce, tomatoes, melted cheese, and crispy fries.",
-    price: 80,
-    image:
-      "https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  },
-  {
-    name: "Biryani", // Changed 'title' to 'name'
-    description: "Flavorful rice with tender meat and spices.",
-    price: 80,
-    image:
-      "https://media.istockphoto.com/id/1410130688/photo/mutton-biryani-served-in-a-golden-dish-isolated-on-dark-background-side-view-indian-food.jpg?b=1&s=612x612&w=0&k=20&c=DiaW0yTvt1-ydUk_f_i7YyJ8KoS8ODeHeGlJawwS0o0=",
-  },
-  {
-    name: "Pizza", // Changed 'title' to 'name'
-    description: "Crispy crust, tangy tomato sauce, melted cheese, and favorite toppings.",
-    price: 80,
-    image:
-      "https://images.pexels.com/photos/3915857/pexels-photo-3915857.jpeg?auto=compress&cs=tinysrgb&w=600",
-  },
-];
+// Static predefined menu
+// const staticMenus = [
+//   {
+//     name: "Burger",
+//     description: "Juicy beef patty, fresh lettuce, tomatoes, melted cheese, and crispy fries.",
+//     price: 80,
+//     image: "https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg",
+//   },
+//   {
+//     name: "Biryani",
+//     description: "Flavorful rice with tender meat and spices.",
+//     price: 80,
+//     image: "https://media.istockphoto.com/id/1410130688/photo/mutton-biryani.jpg",
+//   },
+//   {
+//     name: "Pizza",
+//     description: "Crispy crust, tangy tomato sauce, melted cheese, and favorite toppings.",
+//     price: 80,
+//     image: "https://images.pexels.com/photos/3915857/pexels-photo-3915857.jpeg",
+//   },
+// ];
 
 const AddMenu = () => {
   const [input, setInput] = useState<MenuFormSchema>({
@@ -49,18 +49,21 @@ const AddMenu = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState<boolean>(false);
   const [selectedMenu, setSelectedMenu] = useState<any>();
-  const loading = false;
   const [error, setError] = useState<Partial<MenuFormSchema>>({});
+  
+  // Zustand store actions
+  const { loading, createMenu } = useMenuStore();
+  const { restaurant, getRestaurant } = useRestaurantStore();
+
+
 
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setInput({ ...input, [name]: type === "number" ? Number(value) : value });
   };
 
-  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    //Api implementation
-    console.log(input);
     const result = menuSchema.safeParse(input);
     if (!result.success) {
       const fieldErrors = result.error.formErrors.fieldErrors;
@@ -68,12 +71,31 @@ const AddMenu = () => {
       return;
     }
 
-    //api implementation starts from here
+    
+
+    try {
+      const formData = new FormData();
+    formData.append("name", input.name);
+    formData.append("description", input.description);
+    formData.append("price", input.price.toString());
+    if (input.image) {
+      formData.append("image", input.image);
+    }
+      await createMenu(formData);
+      setOpen(false); // Close dialog after successful submission
+      await getRestaurant(); // Fetch updated menus
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    getRestaurant();
+  }, [getRestaurant]);
 
   return (
     <div className="max-w-6xl mx-auto my-10 pr-20 pl-20">
-      <div className="flex justify-between ">
+      <div className="flex justify-between">
         <h1 className="font-bold md:font-extrabold text-lg md:text-2xl flex items-center">
           Available Menu
         </h1>
@@ -91,17 +113,17 @@ const AddMenu = () => {
                 Create a menu that will make your restaurant stand out.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={submitHandler} className="space-y-4" action="">
+            <form onSubmit={submitHandler} className="space-y-4">
               <div>
-                <Label><h1>Name</h1></Label>
+                <Label>Name</Label>
                 <Input
                   type="text"
                   name="name"
                   value={input.name}
                   onChange={changeEventHandler}
-                  placeholder="Enter menu title"
+                  placeholder="Enter menu name"
                 />
-                {error && <span className="text-xs font-medium text-red-600">{error.name}</span>}
+                {error.name && <span className="text-xs font-medium text-red-600">{error.name}</span>}
               </div>
               <div>
                 <Label>Description</Label>
@@ -112,10 +134,12 @@ const AddMenu = () => {
                   onChange={changeEventHandler}
                   placeholder="Enter menu description"
                 />
-                {error && <span className="text-xs font-medium text-red-600">{error.description}</span>}
+                {error.description && (
+                  <span className="text-xs font-medium text-red-600">{error.description}</span>
+                )}
               </div>
               <div>
-                <Label>Price in (Rupees)</Label>
+                <Label>Price (in Rupees)</Label>
                 <Input
                   type="number"
                   name="price"
@@ -123,7 +147,7 @@ const AddMenu = () => {
                   onChange={changeEventHandler}
                   placeholder="Enter menu price"
                 />
-                {error && <span className="text-xs font-medium text-red-600">{error.price}</span>}
+                {error.price && <span className="text-xs font-medium text-red-600">{error.price}</span>}
               </div>
               <div>
                 <Label>Upload Menu Image</Label>
@@ -137,16 +161,18 @@ const AddMenu = () => {
                     })
                   }
                 />
-                {error && <span className="text-xs font-medium text-red-600">{error.image?.name || "Image is required"}</span>}
+                {error.image && (
+                  <span className="text-xs font-medium text-red-600">{error.image?.name}</span>
+                )}
               </div>
-              <DialogFooter className="mt-5">
+              <DialogFooter>
                 {loading ? (
                   <Button disabled className="bg-orange hover:bg-hoverOrange">
                     <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                     Please Wait
                   </Button>
                 ) : (
-                  <Button className="bg-orange hover:bg-hoverOrange">
+                  <Button type="submit" className="bg-orange hover:bg-hoverOrange">
                     Submit
                   </Button>
                 )}
@@ -155,21 +181,21 @@ const AddMenu = () => {
           </DialogContent>
         </Dialog>
       </div>
-      {menu.map((menu: any, idx: number) => (
+      {restaurant?.menus.map((menu: any, idx: number) => (
         <div key={idx} className="mt-6 space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 md:p-4 p-2 shadow-md rounded-lg border h  ">
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-4 md:p-4 p-2 shadow-md rounded-lg border">
             <img
               src={menu.image}
               alt=""
-              className="md:h-24 md:w-24 h-18 w-full object-cover rounded-lg"
+              className="md:h-24 md:w-24 h-16 w-full object-cover rounded-lg"
             />
             <div className="flex-1">
               <h1 className="text-lg font-semibold text-gray-800">
-                {menu.name} {/* Changed 'title' to 'name' */}
+                {menu.name}
               </h1>
-              <p className="text-sm text-gray-600 mt-1">{menu.description}</p>
+              <p className="text-sm tex-gray-600 mt-1">{menu.description}</p>
               <h2 className="text-md font-semibold mt-2">
-                Price: <span className="text-[#D19254]">{menu.price}</span>
+                Price: <span className="text-[#D19254]">80</span>
               </h2>
             </div>
             <Button
@@ -177,7 +203,8 @@ const AddMenu = () => {
                 setSelectedMenu(menu);
                 setEditOpen(true);
               }}
-              className="bg-orange hover:bg-hoverOrange mt-2 pr-8 pl-8"
+              size={"sm"}
+              className="bg-orange hover:bg-hoverOrange mt-2"
             >
               Edit
             </Button>
