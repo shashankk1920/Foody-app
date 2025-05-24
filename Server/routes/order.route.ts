@@ -1,6 +1,7 @@
 import express from "express"
-import { createCheckoutSession, getOrders } from "../controller/order.controller";
+import { createCheckoutSession, getOrders, stripeWebhook } from "../controller/order.controller";
 import { isAuthenticated } from "../middlewares/isAuthenticated";
+// import { verifyJWT } from "../middlewares/verifyJWT";
 import { Request, Response } from 'express';
 
 
@@ -13,7 +14,11 @@ router.route("/").get(isAuthenticated, (req: Request, res: Response) => {
 		res.status(500).send("Internal Server Error");
 	});
 });
-router.route("/checkout/create-checkout-session ").post(isAuthenticated, createCheckoutSession)
-// router.route("webhook").post()
+router.route("/checkout/create-checkout-session").post(isAuthenticated, createCheckoutSession);
+
+
+
+router.route("/webhook").post(express.raw({type: 'application/json'}), stripeWebhook);
+
 
 export default router;

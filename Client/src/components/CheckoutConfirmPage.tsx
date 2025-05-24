@@ -1,115 +1,149 @@
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogClose } from "@radix-ui/react-dialog";
-import { Label } from "@radix-ui/react-label";
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+} from "./ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { useUserStore } from "../store/useUserStore";
+import { CheckoutSessionRequest } from "../types/orderType";
+import { useCartStore } from "../store/useCartStore";
+import { useRestaurantStore } from "../store/useRestaurantStore";
 
-const CheckoutConfirmPage = ({ open, setOpen }: { open: boolean; setOpen: Dispatch<SetStateAction<boolean>> }) => {
+import { Loader2 } from "lucide-react";
+import { useOrderStore } from "../store/useOrderStore";
+
+const CheckoutConfirmPage = ({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
+  const { user } = useUserStore();
   const [input, setInput] = useState({
-    name: "",
-    email: "",
-    contact: "",
-    address: "",
-    city: "",
-    country: ""
+    name: user?.fullname || "",
+    email: user?.email || "",
+    contact: user?.contact.toString() || "",
+    address: user?.address || "",
+    city: user?.city || "",
+    country: user?.country || "",
   });
-
+  const { cart } = useCartStore();
+  const { restaurant } = useRestaurantStore();
+  const { createCheckoutSession, loading } = useOrderStore();
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log(`Input Changed - ${name}: ${value}`); // Debugging log
     setInput({ ...input, [name]: value });
   };
-
-  const checkoutHandler = (e: FormEvent<HTMLFormElement>) => {
+  const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // API implementation starts here
-    console.log("Form Submitted", input); // 
+    // api implementation start from here
+    try {
+      const checkoutData: CheckoutSessionRequest = {
+        cartItems: cart.map((cartItem) => ({
+          menuId: cartItem._id,
+          name: cartItem.name,
+          image: cartItem.image,
+          price: cartItem.price.toString(),
+          quantity: cartItem.quantity.toString(),
+        })),
+        deliveryDetails: input,
+        restaurantId: restaurant?._id as string,
+      };
+      await createCheckoutSession(checkoutData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white p-6 rounded-md shadow-md w-full max-w-lg">
-          <DialogTitle className="text-lg font-bold mb-2">Review Your Order</DialogTitle>
-          <DialogDescription className="text-sm text-gray-500 mb-4">
-            Double-check your information for delivery.
-          </DialogDescription>
-          <form onSubmit={checkoutHandler} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Full Name</Label>
-                <Input
-                  type="text"
-                  name="name"
-                  value={input.name}
-                  onChange={changeEventHandler}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  name="email"
-                  value={input.email}
-                  onChange={changeEventHandler}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label>Contact</Label>
-                <Input
-                  type="text"
-                  name="contact"
-                  value={input.contact}
-                  onChange={changeEventHandler}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label>Address</Label>
-                <Input
-                  type="text"
-                  name="address"
-                  value={input.address}
-                  onChange={changeEventHandler}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label>City</Label>
-                <Input
-                  type="text"
-                  name="city"
-                  value={input.city}
-                  onChange={changeEventHandler}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label>Country</Label>
-                <Input
-                  type="text"
-                  name="country"
-                  value={input.country}
-                  onChange={changeEventHandler}
-                  className="w-full"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end space-x-4 mt-6">
-              
-              <Button type="submit" className="bg-orange hover:bg-hoverOrange">Continue to Payment</Button>
-              <DialogClose asChild>
-                <Button type="button" className="bg-gray-300 hover:bg-gray-400">Close</Button>
-              </DialogClose>
-            </div>
-          </form>
-        </div>
+      <DialogContent>
+        <DialogTitle className="font-semibold">Review Your Order</DialogTitle>
+        <DialogDescription className="text-xs">
+          Double-check your delivery details and ensure everything is in order.
+          When you are ready, hit confirm button to finalize your order
+        </DialogDescription>
+        <form
+          onSubmit={checkoutHandler}
+          className="md:grid grid-cols-2 gap-2 space-y-1 md:space-y-0"
+        >
+          <div>
+            <Label>Fullname</Label>
+            <Input
+              type="text"
+              name="name"
+              value={input.name}
+              onChange={changeEventHandler}
+            />
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input
+              disabled
+              type="email"
+              name="email"
+              value={input.email}
+              onChange={changeEventHandler}
+            />
+          </div>
+          <div>
+            <Label>Contact</Label>
+            <Input
+              type="text"
+              name="contact"
+              value={input.contact}
+              onChange={changeEventHandler}
+            />
+          </div>
+          <div>
+            <Label>Address</Label>
+            <Input
+              type="text"
+              name="address"
+              value={input.address}
+              onChange={changeEventHandler}
+            />
+          </div>
+          <div>
+            <Label>City</Label>
+            <Input
+              type="text"
+              name="city"
+              value={input.city}
+              onChange={changeEventHandler}
+            />
+          </div>
+          <div>
+            <Label>Country</Label>
+            <Input
+              type="text"
+              name="country"
+              value={input.country}
+              onChange={changeEventHandler}
+            />
+          </div>
+          <DialogFooter className="col-span-2 pt-5">
+            {loading ? (
+              <Button disabled className="bg-orange hover:bg-hoverOrange">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please wait
+              </Button>
+            ) : (
+              <Button className="bg-orange hover:bg-hoverOrange">
+                Continue To Payment
+              </Button>
+            )}
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
 };
 
 export default CheckoutConfirmPage;
-

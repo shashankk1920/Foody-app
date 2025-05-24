@@ -29,12 +29,17 @@ import {
 } from "./sheet";
 import { Separator } from "@radix-ui/react-separator";
 import { useUserStore } from "../../store/useUserStore";
+import { useCartStore } from "../../store/useCartStore";
+import { useThemeStore } from "../../store/useThemeStore";
 
 
 
 
 const NavBar = () => {
  const {user, loading, logout} = useUserStore();
+ const {cart} = useCartStore();
+    const{setTheme}=useThemeStore();
+
   
 
 
@@ -59,7 +64,7 @@ const NavBar = () => {
           Order
         </Link>
         <Link
-          to="/order/status"
+          to="/profile"
           className="flex items-center gap-2 hover:text-hoverOrange transition duration-300 ease-in-out"
         >
           Profile
@@ -89,12 +94,13 @@ const NavBar = () => {
       <div className="hidden md:flex items-center gap-4">
         <Link to="/cart" className="relative cursor-pointer">
           <ShoppingCart className="ml-4 w-8 h-8" />
-          <Button
+          { cart?.length > 0 && ( <Button
             size="icon"
             className="absolute top-0 right-0 text-xs rounded-full h-4 w-4 bg-red-500 text-white flex items-center justify-center transform translate-x-1/2 -translate-y-1/2"
           >
-            S
-          </Button>
+            {cart?.length}
+          </Button>)}
+         
         </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -105,12 +111,12 @@ const NavBar = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Light</DropdownMenuItem>
-            <DropdownMenuItem>Dark</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Avatar>
-          <AvatarImage />
+          <AvatarImage src={user?.profilePicture} alt="profilePhoto"/>
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>
@@ -138,6 +144,7 @@ export default NavBar;
 
 const MobileNavbar = () => {
    const {user, loading, logout} = useUserStore();
+   const{setTheme}=useThemeStore();
    
 
   return (
@@ -159,8 +166,8 @@ const MobileNavbar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Light</DropdownMenuItem>
-              <DropdownMenuItem>Dark</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SheetHeader>
@@ -206,7 +213,7 @@ const MobileNavbar = () => {
     <>
     <div className="flex flex-row item-center gap-2">
       <Avatar>
-        <AvatarImage/>
+        <AvatarImage src={user?.profilePicture}/>
         <AvatarFallback>CN</AvatarFallback>
 
       </Avatar>

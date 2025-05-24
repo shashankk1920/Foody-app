@@ -1,25 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Loader2, LocateIcon, Mail, MapPin, MapPinHouse, Plus } from "lucide-react";
+import { Loader2, LocateIcon, Mail, MapPin, MapPinHouse, MapPinnedIcon, Plus } from "lucide-react";
 import { useRef, useState, FormEvent } from "react";
 import { Input } from "./ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Button } from "./ui/button";
+import { useUserStore } from "../store/useUserStore";
 
 const Profile = () => {
+  const {user, updateProfile} = useUserStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [profileData, setProfileData] = useState({
-    fullname: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    country: "",
-    profilePicture: "",
+    fullname: user?.fullname || "",
+    email: user?.email || "", 
+    address: user?.address || "",
+    city: user?.city || "",
+    country: user?.country || "",
+    profilePicture: user?.profilePicture || "",
   });
-
   const imageRef = useRef<HTMLInputElement | null>(null);
-  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>("");
-  const loading = false;
-
+  const [selectedProfilePicture, setSelectedProfilePicture] =
+    useState<string>( profileData.profilePicture || "");
+ 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -41,28 +42,30 @@ const Profile = () => {
     setProfileData({ ...profileData, [name]: value });
   };
 
-  const updateProfileHandler = (e: FormEvent<HTMLFormElement>) => {
+  const updateProfileHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-   //profile api implemetnation 
+    try {
+      setIsLoading(true);
+      await updateProfile(profileData);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
 
   return (
-    
-    <form onSubmit={updateProfileHandler} className="max-w-7xl mx-auto my-5 pr-20 pl-20">
-      <div className="flex items-center justify-between pl-7">
+    <form onSubmit={updateProfileHandler} className="max-w-7xl mx-auto my-5">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Avatar className="relative md:w-28 md:h-20 w-24 h-20 rounded-100% ">
-            {selectedProfilePicture ? (
-              <AvatarImage src={selectedProfilePicture} className="object-cover w-full h-full rounded-full" />
-            ) : (
-              <AvatarFallback className="pt-2">CN</AvatarFallback>
-            )}
+          <Avatar className="relative md:w-28 md:h-28 w-20 h-20">
+            <AvatarImage src={selectedProfilePicture}/>
+            <AvatarFallback>CN</AvatarFallback>
             <input
               ref={imageRef}
+              className="hidden"
               type="file"
               accept="image/*"
               onChange={fileChangeHandler}
-              className="hidden"
             />
             <div
               onClick={() => imageRef.current?.click()}
@@ -81,11 +84,12 @@ const Profile = () => {
         </div>
       </div>
       <div className="grid md:grid-cols-4 md:gap-2 gap-3 my-10">
-        <div className="flex item-center gap-4 rounded-sm p-2 bg-gray-200 pl-4">
+        <div className="flex items-center gap-4 rounded-sm p-2 bg-gray-200">
           <Mail className="text-gray-500" />
           <div className="w-full">
             <Label>Email</Label>
             <input
+            disabled
               name="email"
               value={profileData.email}
               onChange={changeHandler}
@@ -93,7 +97,7 @@ const Profile = () => {
             />
           </div>
         </div>
-        <div className="flex item-center gap-4 rounded-sm p-2 bg-gray-200 pl-4">
+        <div className="flex items-center gap-4 rounded-sm p-2 bg-gray-200">
           <LocateIcon className="text-gray-500" />
           <div className="w-full">
             <Label>Address</Label>
@@ -105,7 +109,7 @@ const Profile = () => {
             />
           </div>
         </div>
-        <div className="flex item-center gap-4 rounded-sm p-2 bg-gray-200 pl-4">
+        <div className="flex items-center gap-4 rounded-sm p-2 bg-gray-200">
           <MapPin className="text-gray-500" />
           <div className="w-full">
             <Label>City</Label>
@@ -117,8 +121,8 @@ const Profile = () => {
             />
           </div>
         </div>
-        <div className="flex item-center gap-4 rounded-sm p-2 bg-gray-200 pl-4">
-          <MapPinHouse className="text-gray-500" />
+        <div className="flex items-center gap-4 rounded-sm p-2 bg-gray-200">
+          <MapPinnedIcon className="text-gray-500" />
           <div className="w-full">
             <Label>Country</Label>
             <input
@@ -128,19 +132,18 @@ const Profile = () => {
               className="w-full text-gray-600 bg-transparent focus-visible:ring-0 focus-visible:border-transparent outline-none border-none"
             />
           </div>
-          
         </div>
-       
       </div>
       <div className="text-center">
-          {loading ? (
-            <Button className="bg-orange hover:bg-hoverOrange">
-              <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-            </Button>
-          ) : (
-            <Button className="bg-orange hover:bg-hoverOrange">Update</Button>
-          )}
-        </div>
+        {isLoading ? (
+          <Button disabled className="bg-orange hover:bg-hoverOrange">
+            <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+            Please wait
+          </Button>
+        ) : (
+          <Button type="submit" className="bg-orange hover:bg-hoverOrange">Update</Button>
+        )}
+      </div>
     </form>
   );
 };

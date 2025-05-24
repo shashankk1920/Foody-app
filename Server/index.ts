@@ -34,6 +34,8 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/restaurant", restauntRoutes);
 app.use("/api/v1/menu", menuRoutes);
 app.use("/api/v1/order", orderRoute);
+//app.use("/api/v1", orderRoute);
+
 
 // Start the server
 app.listen(PORT, () => {

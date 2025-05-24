@@ -22,6 +22,9 @@ import Succcess from "./components/Succcess.tsx";
 import { useUserStore } from "./store/useUserStore.ts";
 import { useEffect } from "react";
 import Loading from "./components/ui/Loading.tsx";
+import PrivacyPolicy from "./components/PrivacyPolicy.tsx";
+import TermsOfService from "./components/TermsOfService.tsx";
+import ContactUs from "./components/ContactUs.tsx";
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
@@ -63,6 +66,19 @@ const appRouter = createBrowserRouter([
    
 
     children:[
+        // ...existing routes
+    {
+      path: "/privacy-policy",
+      element: <PrivacyPolicy />,
+    },
+    {
+      path: "/terms-of-service",
+      element: <TermsOfService />,
+    },
+    {
+      path: "/contact-us",
+      element: <ContactUs />,
+    },
       {
         path:"/",
         element:<HeroSection/>,

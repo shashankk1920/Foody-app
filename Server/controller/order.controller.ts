@@ -35,55 +35,83 @@ export const getOrders = async (req: Request, res: Response) => {
     }
 }
 
-export const createCheckoutSession = async (req: Request, res: Response):Promise<any> => {
-    try {
-        const checkoutSessionRequest: CheckoutSessionRequest = req.body;
-        const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate('menus');
-        if (!restaurant) {
-            return res.status(404).json({
-                success: false,
-                message: "Restaurant not found."
-            })
-        };
-        const newOrder: any = new order({
-            restaurant: restaurant._id,
-            user: req.id,
-            deliveryDetails: checkoutSessionRequest.deliveryDetails,
-            cartItems: checkoutSessionRequest.cartItems,
-            status: "pending"
-        });
+export const createCheckoutSession = async (req: Request, res: Response): Promise<any> => {
+  try {
+    console.log("➡️ createCheckoutSession called");
+    const checkoutSessionRequest: CheckoutSessionRequest = req.body;
+    console.log("🛒 Checkout Session Request:", checkoutSessionRequest);
 
-        // line items
-        const menuItems = restaurant.menus;
-        const lineItems = createLineItems(checkoutSessionRequest, menuItems);
-
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            shipping_address_collection: {
-                allowed_countries: ['GB', 'US', 'CA']
-            },
-            line_items: lineItems,
-            mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL}/order/status`,
-            cancel_url: `${process.env.FRONTEND_URL}/cart`,
-            metadata: {
-                orderId: newOrder._id.toString(),
-                images: JSON.stringify(menuItems.map((item: any) => item.image))
-            }
-        });
-        if (!session.url) {
-            return res.status(400).json({ success: false, message: "Error while creating session" });
-        }
-        await newOrder.save();
-        return res.status(200).json({
-            session
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server error" })
-
+    const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate('menus');
+    if (!restaurant) {
+      console.log("❌ Restaurant not found");
+      return res.status(404).json({
+        success: false,
+        message: "Restaurant not found."
+      });
     }
-}
+
+    const menuItems = restaurant.menus;
+
+    // Create line items for Stripe
+    const lineItems = createLineItems(checkoutSessionRequest, menuItems);
+    console.log("✅ Line Items Created:", lineItems);
+
+    // Calculate total amount in paise (smallest currency unit)
+    const totalAmount = lineItems.reduce(
+      (acc, item) => acc + item.price_data.unit_amount * Number(item.quantity),
+      0
+    );
+
+    // Minimum amount check (₹50 = 5000 paise)
+    const MIN_AMOUNT = 5000;
+    if (totalAmount < MIN_AMOUNT) {
+      return res.status(400).json({
+        success: false,
+        message: `Minimum order amount is ₹50. Your order total is ₹${(totalAmount / 100).toFixed(2)}`
+      });
+    }
+
+    // Create new order with totalAmount set
+    const newOrder: any = new order({
+      restaurant: restaurant._id,
+      user: req.id,
+      deliveryDetails: checkoutSessionRequest.deliveryDetails,
+      cartItems: checkoutSessionRequest.cartItems,
+      status: "pending",
+      totalAmount: totalAmount / 100, // convert back to rupees if your schema expects INR in rupees, else keep paise
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      shipping_address_collection: {
+        allowed_countries: ['GB', 'US', 'CA']
+      },
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${process.env.FRONTEND_URL}/order/status`,
+      cancel_url: `${process.env.FRONTEND_URL}/cart`,
+      metadata: {
+        orderId: newOrder._id.toString(),
+        images: JSON.stringify(menuItems.map((item: any) => item.image))
+      }
+    });
+
+    if (!session.url) {
+      console.log("❌ Stripe session URL missing");
+      return res.status(400).json({ success: false, message: "Error while creating session" });
+    }
+
+    await newOrder.save();
+    console.log("✅ Order Saved");
+
+    return res.status(200).json({ session });
+  } catch (error) {
+    console.error("❌ Stripe Checkout Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 
 export const stripeWebhook = async (req: Request, res: Response):Promise<any> => {
     let event;
@@ -133,6 +161,8 @@ export const stripeWebhook = async (req: Request, res: Response):Promise<any> =>
     // Send a 200 response to acknowledge receipt of the event
     res.status(200).send();
 };
+
+
 
 export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, menuItems: any) => {
     // 1. create line items

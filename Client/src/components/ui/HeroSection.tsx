@@ -11,12 +11,13 @@ const HeroSection = () => {
 
   
   return (
+     <div className="text-gray-800 bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600 min-h-screen">
     <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-4 md:p-10 rounded-lg items-center justify-between gap-10 h-screen ">
       <div className="flex flex-col gap-5 md:w-[50%] ml-7 ">
-        <h1 className=" md:font-extrabold md:text-5xl text-2xl  bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text  font-extrabold text-transparent sm:text-5xl mb-2 ">
+        <h1 className=" md:font-extrabold md:text-5xl text-2xl   text-gray-100  font-extrabold  sm:text-5xl mb-2  drop-shadow-[1px_1px_0px_black]">
           Order Food Anytime and Anywhere
         </h1>
-        <p className="font-semibold  text-sm md:text-xl pt-2 mb-5 md:font-extrabold    bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 bg-clip-text  text-transparent sm:text-5xl text-[#A52A2A]">
+        <p className="font-semibold  text-sm md:text-xl pt-2 mb-5 md:font-extrabold drop-shadow-[1px_1px_0px_black]   text-gray-100">
           Hey! Our Delicious food is waiting for you, we are always near to you
         </p>
         <div className="relative flex items-center gap-3 w-full">
@@ -40,6 +41,7 @@ const HeroSection = () => {
           className="object-cover w-full max-h-[300px] rounded-3xl opacity-95 transition-transform duration-500 ease-in-out transform hover:scale-110   "
         />
       </div>
+    </div>
     </div>
   );
 };
