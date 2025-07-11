@@ -10,7 +10,7 @@ const VerifyEmail = () => {
   //we are useref beacuse we want to target the box means wwhen we write in the one box of than automatically moves to another box
 
   const inputRef = useRef<any>([]);
-  const navigate = useNavigate();
+  
   const {loading, verifyEmail} = useUserStore();
   const handleChange = (index: number, value: string) => {
     if (/^[a-zA-Z0-9]$/.test(value) || value === "") {
