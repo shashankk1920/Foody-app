@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { MenuItem, RestaurantState } from "../types/restaurantTypes";
 import { Orders } from "../types/orderType";
 
-const API_END_POINT = "http://localhost:8000/api/v1/restaurant"; // For local development
+const API_END_POINT = "https://foody-app-v86b.onrender.com/api/v1/restaurant"; // For local development
 axios.defaults.withCredentials = true;
 
 export const useRestaurantStore = create<RestaurantState >()(
