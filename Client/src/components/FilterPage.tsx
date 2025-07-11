@@ -24,7 +24,7 @@ const FilterPage = () => {
     searchRestaurant,
   } = useRestaurantStore();
 
-  const appliedFilterHandler = (value: string, checked: boolean) => {
+  const appliedFilterHandler = (value: string) => {
     setAppliedFilter(value); // Zustand store already toggles based on existence
   };
 
@@ -52,8 +52,8 @@ const FilterPage = () => {
             <Checkbox
               id={option.id}
               checked={appliedFilter.includes(option.label)}
-              onCheckedChange={(checked) =>
-                appliedFilterHandler(option.label, checked === true)
+              onCheckedChange={() =>
+                appliedFilterHandler(option.label)
               }
               className="cursor-pointer"
             />
