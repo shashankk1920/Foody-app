@@ -1,5 +1,5 @@
 import { MenuItem } from "../types/restaurantTypes";
-import { CartItem } from "../types/cartType";
+
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { useCartStore } from "../store/useCartStore";
