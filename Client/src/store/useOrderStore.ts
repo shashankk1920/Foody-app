@@ -4,7 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 
-const API_END_POINT = "http://localhost:8000/api/v1/order"; // Updated to use HTTP for local development
+const API_END_POINT = "https://foody-app-v86b.onrender.com/api/v1/order"; // Updated to use HTTP for local development
 axios.defaults.withCredentials = true; 
 
 export const useOrderStore = create<OrderState>()(persist((set => ({
