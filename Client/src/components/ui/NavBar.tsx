@@ -15,8 +15,7 @@ import { Link } from "react-router-dom";
 import { Button } from "./button";
 import { HandPlatter, Loader2, Menu, Moon, PackageCheck, ShoppingCart, SquareMenu, Sun, User, UtensilsCrossed } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Label } from "@radix-ui/react-label";
-import { Input } from "./input";
+
 import {
   Sheet,
   SheetClose,
