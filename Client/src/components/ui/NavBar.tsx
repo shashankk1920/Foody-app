@@ -38,7 +38,7 @@ import { useThemeStore } from "../../store/useThemeStore";
 const NavBar = () => {
  const {user, loading, logout} = useUserStore();
  const {cart} = useCartStore();
-    const{setTheme}=useThemeStore();
+    const{setTheme}=useThemeStore(); 
 
   
 
@@ -111,13 +111,13 @@ const NavBar = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setTheme('light')}>Light</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme('light')} >Light</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Avatar>
-          <AvatarImage src={user?.profilePicture} alt="profilePhoto"/>
-          <AvatarFallback>CN</AvatarFallback>
+        <Avatar className="relative w-18 h-14 border-2 border-orange rounded-full">
+          <AvatarImage src={user?.profilePicture} alt="profilePhoto" className="w-full h-full object-cover rounded-full" />
+          <AvatarFallback className="text-lg font-bold bg-gray-300 rounded-full flex items-center justify-center">CN</AvatarFallback>
         </Avatar>
         <div>
           {loading ? (

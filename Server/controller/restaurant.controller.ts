@@ -136,35 +136,27 @@ export const updateOrderStatus = async (req: Request, res: Response):Promise<any
 }
 export const searchRestaurant = async (req: Request, res: Response): Promise<any> => {
     try {
-        const searchText = req.params.searchText || "";
-        const searchQuery = req.query.searchQuery as string || "";
-        const selectedCuisines = (req.query.selectedCuisines as string || "").split(",").filter(cuisine => cuisine);
+        const searchText = req.query.q as string || "";
+        const selectedCuisines = (req.query.selectedCuisines as string || "")
+            .split(",")
+            .filter(cuisine => cuisine.trim() !== "");
+
         const query: any = {};
-        
-        if (searchText || searchQuery) {
-            query.$or = [];
 
-            if (searchText) {
-                query.$or.push(
-                    { restaurantName: { $regex: searchText, $options: 'i' } },
-                    { city: { $regex: searchText, $options: 'i' } },
-                    { country: { $regex: searchText, $options: 'i' } }
-                );
-            }
-
-            if (searchQuery) {
-                query.$or.push(
-                    { restaurantName: { $regex: searchQuery, $options: 'i' } },
-                    { cuisines: { $regex: searchQuery, $options: 'i' } }
-                );
-            }
+        if (searchText) {
+            query.$or = [
+                { restaurantName: { $regex: searchText, $options: 'i' } },
+                { city: { $regex: searchText, $options: 'i' } },
+                { country: { $regex: searchText, $options: 'i' } },
+                { cuisines: { $regex: searchText, $options: 'i' } },
+            ];
         }
 
         if (selectedCuisines.length > 0) {
             query.cuisines = { $in: selectedCuisines };
         }
-        
-        console.log("Search Query:", JSON.stringify(query, null, 2)); // Debugging
+
+        console.log("Search Query:", JSON.stringify(query, null, 2));
 
         const restaurants = await Restaurant.find(query);
         return res.status(200).json({
@@ -176,6 +168,7 @@ export const searchRestaurant = async (req: Request, res: Response): Promise<any
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 export const getSingleRestaurant = async (req: Request, res: Response): Promise<any> => {
     try {

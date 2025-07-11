@@ -1,7 +1,10 @@
 {
+  "engines": {
+    "node": "20.18.1"
+  },
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "dev": "nodemon index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"

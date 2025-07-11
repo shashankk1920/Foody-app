@@ -11,7 +11,7 @@ const HeroSection = () => {
 
   
   return (
-     <div className="text-gray-800 bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600 min-h-screen">
+      <div className="min-h-screen bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600">
     <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-4 md:p-10 rounded-lg items-center justify-between gap-10 h-screen ">
       <div className="flex flex-col gap-5 md:w-[50%] ml-7 ">
         <h1 className=" md:font-extrabold md:text-5xl text-2xl   text-gray-100  font-extrabold  sm:text-5xl mb-2  drop-shadow-[1px_1px_0px_black]">

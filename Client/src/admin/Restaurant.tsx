@@ -102,7 +102,10 @@ const Restaurant = () => {
   }, []);
   
   return (
-    <div className="max-w-6xl mx-auto my-10 p-6 bg-white rounded-md shadow-md">
+    
+    
+    
+    <div className="max-w-6xl mx-auto my-10 p-6  bg-white rounded-md shadow-md">
       <h1 className="font-extrabold text-2xl mb-5 text-center">Add Restaurant</h1>
       <form onSubmit={submitHandler}>
         <div className="grid md:grid-cols-2 gap-6">
