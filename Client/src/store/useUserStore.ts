@@ -4,7 +4,7 @@ import axios from "axios";
 import { LoginInputState, SignupInputState } from "../schema/userSchema";
 import { toast } from "sonner";
 
-const API_END_POINT = "http://localhost:8000/api/v1/user"; // Updated to use HTTP for local development
+const API_END_POINT = "https://foody-app-v86b.onrender.com/api/v1/user"; // Updated to use HTTP for local development
 axios.defaults.withCredentials = true;
 
 type User = {
