@@ -13,12 +13,14 @@ import { Loader2 } from "lucide-react";
 import { MenuFormSchema, menuSchema } from "../schema/menuSchema";
 import { useMenuStore } from "../store/useMenuStore";
 
+type MenuWithId = MenuFormSchema & { _id: string };
+
 const EditMenu = ({
   selectedMenu,
   editOpen,
   setEditOpen,
 }: {
-  selectedMenu: MenuFormSchema;
+  selectedMenu: MenuWithId;
   editOpen: boolean;
   setEditOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
