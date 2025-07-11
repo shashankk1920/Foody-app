@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { useRestaurantStore } from "./useRestaurantStore";
 
 
-const API_END_POINT = "http://localhost:8000/api/v1/menu"; // Updated to use HTTP for local development
+const API_END_POINT ="https://foody-app-v86b.onrender.com/api/v1/menu";
 axios.defaults.withCredentials = true;
 
 
