@@ -26,12 +26,12 @@ import PrivacyPolicy from "./components/PrivacyPolicy.tsx";
 import TermsOfService from "./components/TermsOfService.tsx";
 import ContactUs from "./components/ContactUs.tsx";
 
+
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-
   if (!user?.isVerified) {
     return <Navigate to="/verify-email" replace />;
   }
@@ -40,122 +40,99 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
 
 const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
-  if(isAuthenticated && user?.isVerified){
-    return <Navigate to="/" replace/>
+  if (isAuthenticated && user?.isVerified) {
+    return <Navigate to="/" replace />;
   }
   return children;
 };
 
-const AdminRoute = ({children}:{children:React.ReactNode}) => {
-  const {user, isAuthenticated} = useUserStore();
-  if(!isAuthenticated){
-    return <Navigate to="/login" replace/>
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, isAuthenticated } = useUserStore();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
-  if(!user?.admin){
-    return <Navigate to="/" replace/>
+  if (!user?.admin) {
+    return <Navigate to="/" replace />;
   }
-
   return children;
-}
+};
 
+// 🆕 Public Routes moved outside protected layout
 const appRouter = createBrowserRouter([
   {
-    path:"/",
-     element:<ProtectedRoutes><MainLayout/></ProtectedRoutes>,
-    // element:<MainLayout/>,
-   
-
-    children:[
-        // ...existing routes
-    {
-      path: "/privacy-policy",
-      element: <PrivacyPolicy />,
-    },
-    {
-      path: "/terms-of-service",
-      element: <TermsOfService />,
-    },
-    {
-      path: "/contact-us",
-      element: <ContactUs />,
-    },
+    path: "/",
+    element: <ProtectedRoutes><MainLayout /></ProtectedRoutes>,
+    children: [
+      { path: "/", element: <HeroSection /> },
+      { path: "/profile", element: <Profile /> },
+      { path: "/search/:text", element: <SearchPage /> },
+      { path: "/restaurant/:id", element: <ResturantDetails /> },
+      { path: "/cart", element: <Cart /> },
+      { path: "/order/status", element: <Succcess /> },
       {
-        path:"/",
-        element:<HeroSection/>,
+        path: "/admin/restaurant",
+        element: <AdminRoute><Restaurant /></AdminRoute>,
       },
       {
-        path:"/profile",
-        element:<Profile/>,
+        path: "/admin/menu",
+        element: <AdminRoute><AddMenu /></AdminRoute>,
       },
       {
-        path:"/search/:text",
-        element:<SearchPage/>,
+        path: "/admin/orders",
+        element: <AdminRoute><Order /></AdminRoute>,
       },
-      {
-        path:"/restaurant/:id",
-        element:<ResturantDetails/>,
-      },
-      {
-        path:"/cart",
-        element:<Cart/>,
-      },
-      {
-        path:"/order/status",
-        element:<Succcess/>,
-      },
-      //From here admin services are also started so a user can become a admin and add or remove or remove a restaurant
-      {
-        path:"/admin/restaurant",
-        element:<AdminRoute><Restaurant/></AdminRoute>,
-      },
-      {
-        path:"/admin/menu",
-        element:<AdminRoute><AddMenu/></AdminRoute>,
-      },
-      {
-        path:"/admin/orders",
-        element:<AdminRoute><Order/></AdminRoute>,
-      },
-    ]
+    ],
   },
-    {
-      path:"/login",
-      element:<AuthenticatedUser><Login/></AuthenticatedUser>
-    },
-    {
-      path:"/signup",
-      element:  <AuthenticatedUser><Signup/></AuthenticatedUser>
-    },
-    {
-      path:"/forgot-password",
-      element:<AuthenticatedUser><ForgotPassword/></AuthenticatedUser>
-    },
-    {
-      path:"/reset-password",
-      element:<ResetPassword/>
-    },
-    {
-      path:"/verify-email",
-      element:<VerifyEmail/>
-    }
-  
-])
+  {
+    path: "/login",
+    element: <AuthenticatedUser><Login /></AuthenticatedUser>,
+  },
+  {
+    path: "/signup",
+    element: <AuthenticatedUser><Signup /></AuthenticatedUser>,
+  },
+  {
+    path: "/forgot-password",
+    element: <AuthenticatedUser><ForgotPassword /></AuthenticatedUser>,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
+  },
+  {
+    path: "/verify-email",
+    element: <VerifyEmail />,
+  },
+  // 🆕 These are now accessible without login
+  {
+    path: "/privacy-policy",
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: "/terms-of-service",
+    element: <TermsOfService />,
+  },
+  {
+    path: "/contact-us",
+    element: <ContactUs />,
+  },
+]);
 
 function App() {
   const { checkAuthentication, isCheckingAuth } = useUserStore();
-  // checking auth every time when page is loaded
+
   useEffect(() => {
     checkAuthentication();
   }, [checkAuthentication]);
-  
+
   if (isCheckingAuth) return <Loading />;
-  
+
   return (
     <main>
-      <RouterProvider router={appRouter}></RouterProvider>
+      
+      <RouterProvider router={appRouter} />
     </main>
   );
 }
-
 
 export default App;
