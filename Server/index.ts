@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: "https://foody-app-v86b.onrender.com",
   credentials: true,
 };
 
