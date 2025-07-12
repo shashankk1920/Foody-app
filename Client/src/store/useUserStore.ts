@@ -5,7 +5,7 @@ import { LoginInputState, SignupInputState } from "../schema/userSchema";
 import { toast } from "sonner";
 
 const API_END_POINT = "https://foody-app-v86b.onrender.com/api/v1/user"; // Updated to use HTTP for local development
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = include;
 
 type User = {
     fullname:string;
