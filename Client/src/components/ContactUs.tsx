@@ -22,8 +22,20 @@ const ContactUs = () => {
   };
 
   return (
-    <div className="text-gray-800 bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600 min-h-screen">
+       <div
+  className="relative min-h-screen bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600"
+  style={{
+    backgroundImage:
+      "url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  }}
+  
+>
+  
       <div className="max-w-4xl mx-auto px-6 py-10">
+        
         <h1 className="text-4xl font-extrabold mb-6 text-white text-center drop-shadow-[1px_1px_0px_black] ">📩 Contact Us</h1>
         <p className="mb-6 text-white text-lg text-center drop-shadow-[1px_1px_0px_black]">
           We'd love to hear from you! Fill out the form below and we'll get back to you as soon as possible.
