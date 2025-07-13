@@ -59,16 +59,15 @@ const Profile = () => {
   };
 
   return (
-    <div
-      className="relative min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center px-4"
+        <div
+      className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat px-4 py-12"
       style={{
         backgroundImage:
           "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
       }}
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-40 z-0" />
-
+      {/* Blur + Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-0" />
       {/* Form container */}
       <div className="relative z-10 w-full max-w-7xl">
         <form
@@ -102,12 +101,14 @@ const Profile = () => {
               </Avatar>
 
               <Input
-                type="text"
-                name="fullname"
-                value={profileData.fullname}
-                onChange={changeHandler}
-                className="text-2xl font-bold outline-none border-none focus:ring-2 focus:ring-orange rounded-md p-2"
-              />
+  type="text"
+  name="fullname"
+  value={profileData.fullname}
+  onChange={changeHandler}
+  className="text-2xl font-semibold border border-gray-300 focus:ring-2 focus:ring-orange rounded-md p-2 bg-white shadow-sm w-full"
+  placeholder="Full Name"
+/>
+
             </div>
           </div>
 
