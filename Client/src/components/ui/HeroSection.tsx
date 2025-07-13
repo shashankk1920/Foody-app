@@ -10,7 +10,21 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600">
+  <div
+  className="relative min-h-screen bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600"
+  style={{
+    backgroundImage:
+      "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+  }}
+>
+   {/* Background overlay to reduce image opacity */}
+      <div className="absolute inset-0 bg-black opacity-60 z-0" />
+
+      {/* Main content above the overlay */}
+     
       <div className="flex flex-col md:flex-row max-w-7xl mx-auto px-4 py-16 md:px-12 md:py-14 rounded-lg items-center justify-between gap-10 min-h-screen">
         
         {/* Text Section */}
