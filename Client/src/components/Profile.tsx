@@ -1,5 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Loader2, LocateIcon, Mail, MapPin, MapPinnedIcon, Plus } from "lucide-react";
+import {
+  Loader2,
+  LocateIcon,
+  Mail,
+  MapPin,
+  MapPinnedIcon,
+  Plus,
+} from "lucide-react";
 import { useRef, useState, FormEvent } from "react";
 import { Input } from "./ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
@@ -8,7 +15,7 @@ import { useUserStore } from "../store/useUserStore";
 
 const Profile = () => {
   const { user, updateProfile } = useUserStore();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     fullname: user?.fullname || "",
     email: user?.email || "",
@@ -17,8 +24,11 @@ const Profile = () => {
     country: user?.country || "",
     profilePicture: user?.profilePicture || "",
   });
+
   const imageRef = useRef<HTMLInputElement | null>(null);
-  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>(profileData.profilePicture || "");
+  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>(
+    profileData.profilePicture || ""
+  );
 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,10 +37,7 @@ const Profile = () => {
       reader.onloadend = () => {
         const result = reader.result as string;
         setSelectedProfilePicture(result);
-        setProfileData((prevData) => ({
-          ...prevData,
-          profilePicture: result,
-        }));
+        setProfileData((prev) => ({ ...prev, profilePicture: result }));
       };
       reader.readAsDataURL(file);
     }
@@ -46,26 +53,46 @@ const Profile = () => {
     try {
       setIsLoading(true);
       await updateProfile(profileData);
-      setIsLoading(false);
-    } catch (error) {
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600 text-white">
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white-300 dark:bg-gray-800">
-        <form onSubmit={updateProfileHandler} className="max-w-7xl mx-auto my-5 p-6 bg-white rounded-lg shadow-md">
-          {/* Profile Header */}
+    <div
+      className="relative min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center px-4"
+      style={{
+        backgroundImage:
+          "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-40 z-0" />
+
+      {/* Form container */}
+      <div className="relative z-10 w-full max-w-7xl">
+        <form
+          onSubmit={updateProfileHandler}
+          className="my-10 p-6 bg-white rounded-lg shadow-3xl shadow-black drop-shadow-lg"
+        >
+          {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Profile Picture */}
               <Avatar className="relative w-28 h-28 border-4 border-orange rounded-full">
-                <AvatarImage src={selectedProfilePicture} className="w-full h-full object-cover rounded-full" />
+                <AvatarImage
+                  src={selectedProfilePicture}
+                  className="w-full h-full object-cover rounded-full"
+                />
                 <AvatarFallback className="text-lg font-bold bg-gray-300 rounded-full flex items-center justify-center">
                   CN
                 </AvatarFallback>
-                <input ref={imageRef} className="hidden" type="file" accept="image/*" onChange={fileChangeHandler} />
+                <input
+                  ref={imageRef}
+                  className="hidden"
+                  type="file"
+                  accept="image/*"
+                  onChange={fileChangeHandler}
+                />
                 <div
                   onClick={() => imageRef.current?.click()}
                   className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-60 rounded-full cursor-pointer"
@@ -74,7 +101,6 @@ const Profile = () => {
                 </div>
               </Avatar>
 
-              {/* Full Name Input */}
               <Input
                 type="text"
                 name="fullname"
@@ -85,15 +111,39 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* User Information Fields */}
+          {/* Fields */}
           <div className="grid md:grid-cols-4 gap-4 my-10">
             {[
-              { icon: <Mail className="text-gray-500" />, label: "Email", name: "email", value: profileData.email, disabled: true },
-              { icon: <LocateIcon className="text-gray-500" />, label: "Address", name: "address", value: profileData.address },
-              { icon: <MapPin className="text-gray-500" />, label: "City", name: "city", value: profileData.city },
-              { icon: <MapPinnedIcon className="text-gray-500" />, label: "Country", name: "country", value: profileData.country },
+              {
+                icon: <Mail className="text-gray-500" />,
+                label: "Email",
+                name: "email",
+                value: profileData.email,
+                disabled: true,
+              },
+              {
+                icon: <LocateIcon className="text-gray-500" />,
+                label: "Address",
+                name: "address",
+                value: profileData.address,
+              },
+              {
+                icon: <MapPin className="text-gray-500" />,
+                label: "City",
+                name: "city",
+                value: profileData.city,
+              },
+              {
+                icon: <MapPinnedIcon className="text-gray-500" />,
+                label: "Country",
+                name: "country",
+                value: profileData.country,
+              },
             ].map(({ icon, label, name, value, disabled }) => (
-              <div key={name} className="flex items-center gap-4 p-3 rounded-md bg-gray-100 shadow-sm">
+              <div
+                key={name}
+                className="flex items-center gap-4 p-3 rounded-md bg-gray-100 shadow-sm"
+              >
                 {icon}
                 <div className="w-full">
                   <Label className="text-gray-600 font-semibold">{label}</Label>
@@ -109,7 +159,7 @@ const Profile = () => {
             ))}
           </div>
 
-          {/* Update Button */}
+          {/* Button */}
           <div className="text-center flex items-center justify-center">
             <Button
               disabled={isLoading}
