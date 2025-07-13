@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
       className="relative min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center px-4"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80')",
+          "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
       }}
     >
       {/* Optional dark overlay */}
