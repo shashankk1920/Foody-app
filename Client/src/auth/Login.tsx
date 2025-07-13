@@ -34,14 +34,14 @@ const Login = () => {
 
   return (
     <div
-      className="relative min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center px-4"
+      className="relative min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat px-4 py-12"
       style={{
         backgroundImage:
           "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
       }}
     >
-      {/* 🔷 Optional Dark Overlay for contrast */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
+      {/* Blur + Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-0" />
 
       {/* Login Form */}
       <form
