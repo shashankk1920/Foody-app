@@ -152,14 +152,32 @@ const Restaurant = () => {
           <div className="flex flex-col">
             <Label className="mb-2">Delivery Time</Label>
             <Input
-            min={0}
-              type="number"
-              name="deliveryTime"
-              value={input.deliveryTime}
-              onChange={changeEventHandler}
-              placeholder="Enter your delivery time"
-              className="w-full"
-            />
+  type="number"
+  name="deliveryTime"
+  value={input.deliveryTime === 0 ? "" : input.deliveryTime}
+  onChange={(e) => {
+    const value = e.target.value;
+    if (Number(value) < 0) return; // prevent negative
+    setInput((prev) => ({
+      ...prev,
+      deliveryTime: value === "" ? 0 : Number(value),
+    }));
+  }}
+  onFocus={(e) => {
+    if (input.deliveryTime === 0) e.target.select(); // clear default 0 on focus
+  }}
+  onBlur={(e) => {
+    if (e.target.value === "") {
+      setInput((prev) => ({
+        ...prev,
+        deliveryTime: 0,
+      }));
+    }
+  }}
+  placeholder="Enter your delivery time"
+  className="w-full"
+/>
+
             {error.deliveryTime && <span className="text-xs text-red-600 font-medium">{error.deliveryTime}</span>}
           </div>
           {/* Cuisines */}
