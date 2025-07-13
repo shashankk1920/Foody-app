@@ -17,27 +17,6 @@ import { MenuFormSchema, menuSchema } from "../schema/menuSchema";
 import { useMenuStore } from "../store/useMenuStore";
 import { useRestaurantStore } from "../store/useRestaurantStore";
 
-// Static predefined menu
-// const staticMenus = [
-//   {
-//     name: "Burger",
-//     description: "Juicy beef patty, fresh lettuce, tomatoes, melted cheese, and crispy fries.",
-//     price: 80,
-//     image: "https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg",
-//   },
-//   {
-//     name: "Biryani",
-//     description: "Flavorful rice with tender meat and spices.",
-//     price: 80,
-//     image: "https://media.istockphoto.com/id/1410130688/photo/mutton-biryani.jpg",
-//   },
-//   {
-//     name: "Pizza",
-//     description: "Crispy crust, tangy tomato sauce, melted cheese, and favorite toppings.",
-//     price: 80,
-//     image: "https://images.pexels.com/photos/3915857/pexels-photo-3915857.jpeg",
-//   },
-// ];
 
 const AddMenu = () => {
   const [input, setInput] = useState<MenuFormSchema>({
@@ -140,13 +119,32 @@ const AddMenu = () => {
               </div>
               <div>
                 <Label>Price (in Rupees)</Label>
-                <Input
-                  type="number"
-                  name="price"
-                  value={input.price}
-                  onChange={changeEventHandler}
-                  placeholder="Enter menu price"
-                />
+<Input
+  type="number"
+  name="price"
+  value={input.price === 0 ? "" : input.price} // show empty if price is 0
+  onChange={(e) => {
+    const value = e.target.value;
+    if (Number(value) < 0) return; // prevent negative
+    setInput((prev) => ({
+      ...prev,
+      price: value === "" ? 0 : Number(value), // fallback to 0 if cleared
+    }));
+  }}
+  onFocus={(e) => {
+    if (input.price === 0) e.target.select(); // auto-select on focus
+  }}
+  onBlur={(e) => {
+    if (e.target.value === "") {
+      setInput((prev) => ({
+        ...prev,
+        price: 0, // reset to 0 if left blank
+      }));
+    }
+  }}
+  placeholder="Enter menu price"
+  min={0}
+/>
                 {error.price && <span className="text-xs font-medium text-red-600">{error.price}</span>}
               </div>
               <div>
