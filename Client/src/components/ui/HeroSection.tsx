@@ -2,7 +2,7 @@ import { Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "./input";
 import { Button } from "./button";
-import HeroImage from "@/assets/Hero.jpg";
+
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
@@ -58,14 +58,7 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Image Section */}
-        <div className="flex items-center justify-center w-full md:w-[50%] max-h-[300px] mt-[-40px] sm:mt-0">
-          <img
-            src={HeroImage}
-            alt="Hero Section"
-            className="object-cover w-[80%] sm:w-[60%] md:w-[80%] max-h-[300px] rounded-3xl opacity-95 transition-transform duration-500 ease-in-out transform hover:scale-110 shadow-lg"
-          />
-        </div>
+       
       </div>
     </div>
   );
