@@ -26,7 +26,7 @@ const ContactUs = () => {
   className="relative min-h-screen bg-gradient-to-r from-purple-500 via-blue-400 to-blue-600"
   style={{
     backgroundImage:
-      "url('https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80')",
+      "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
