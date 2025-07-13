@@ -1,27 +1,24 @@
 import { FormEvent, useRef, useState } from "react";
 import { Input } from "../components/ui/input";
-
 import { Button } from "../components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useUserStore } from "../store/useUserStore";
 
 const VerifyEmail = () => {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
-  //we are useref beacuse we want to target the box means wwhen we write in the one box of than automatically moves to another box
+  const inputRef = useRef<Array<HTMLInputElement | null>>([]);
 
-  const inputRef = useRef<any>([]);
-  
-  const {loading, verifyEmail} = useUserStore();
+  const { loading, verifyEmail } = useUserStore();
+
   const handleChange = (index: number, value: string) => {
     if (/^[a-zA-Z0-9]$/.test(value) || value === "") {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-    }
-    //Move to the next input field id a digit is entered
 
-    if (value != "" && index < 5) {
-      inputRef.current[index + 1].focus();
+      if (value !== "" && index < 5) {
+        inputRef.current[index + 1]?.focus();
+      }
     }
   };
 
@@ -30,58 +27,68 @@ const VerifyEmail = () => {
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRef.current[index];
+      inputRef.current[index - 1]?.focus();
     }
   };
 
-  const submitHandler = async (e:FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-   
-    await verifyEmail(otp.join(""));
-
-  }
+    const code = otp.join("");
+    if (code.length === 6) {
+      await verifyEmail(code);
+    }
+  };
 
   return (
-    <div className="flex items-center justify-center h-screen w-full md:border border-gray-200 bg-[#f7f1e8b4]">
-      <div className="p-8 rounded-md w-full max-w-md flex flex-col gap-10 border border-gray-200">
+    <div
+      className="relative min-h-screen flex items-center justify-center px-4 bg-cover bg-center"
+      style={{
+        backgroundImage:
+          "url('https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg')",
+      }}
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
+
+      {/* OTP Box */}
+      <div className="relative z-10 bg-white bg-opacity-90 backdrop-blur-lg rounded-xl shadow-md border border-gray-200 p-6 sm:p-8 w-full max-w-md flex flex-col gap-8">
         <div className="text-center">
-          <h1 className="font-extrabold text-2xl">Veriify Your Email</h1>
+          <h1 className="text-2xl font-extrabold text-gray-800 mb-1">
+            Verify Your Email
+          </h1>
           <p className="text-sm text-gray-600">
-            Enter the 6 digit code sent your email address
+            Enter the 6-digit code sent to your email
           </p>
         </div>
+
         <form onSubmit={submitHandler}>
-          <div className="flex justify-between">
-            {otp.map((letter: string, idx: number) => (
+          <div className="flex justify-between gap-2 md:gap-3">
+            {otp.map((value, index) => (
               <Input
-                key={idx}
-                ref={(element) => (inputRef.current[idx] = element)}
+                key={index}
+                ref={(el) => (inputRef.current[index] = el)}
                 type="text"
-                value={letter}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleChange(idx, e.target.value)
-                }
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
-                  handleKeyDown(idx, e)
-                }
-                className="md:w-12 md:h-12 w-8 h-8 text:center text-sm md:text-2xl font-normal md:font-bold rounded-lg focus:otuline-none focus-ring-2 focus:ring-indigo-500   "
+                maxLength={1}
+                value={value}
+                onChange={(e) => handleChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                className="w-10 h-10 md:w-12 md:h-12 text-center text-xl font-bold rounded-md focus:outline-none focus:ring-2 focus:ring-orange"
               />
             ))}
           </div>
-          {loading ? (
-            <Button
-              disabled
-              className="bg-orange hover:bg-hoverOrange mt-6 w-full"
-            >
-              {" "}
-              <Loader2 className="mr-2 w-4 h-4 animate-spin" /> Please Wait{" "}
-            </Button>
-          ) : (
-            <Button className="bg-orange hover:bg-hoverOrange mt-6 w-full">
-              {" "}
-              Verify{" "}
-            </Button>
-          )}
+
+          <div className="mt-6">
+            {loading ? (
+              <Button disabled className="w-full bg-orange hover:bg-hoverOrange">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please wait
+              </Button>
+            ) : (
+              <Button className="w-full bg-orange hover:bg-hoverOrange">
+                Verify
+              </Button>
+            )}
+          </div>
         </form>
       </div>
     </div>
