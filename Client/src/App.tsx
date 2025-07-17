@@ -8,7 +8,7 @@ import ForgotPassword from "./auth/ForgotPassword.tsx";
 import ResetPassword from "./auth/ResetPassword.tsx";
 import VerifyEmail from "./auth/VerifyEmail.tsx";
 
-import HeroSection from "./components/ui/HeroSection.tsx";
+import HomePage from "./components/HomePage.tsx";
 import MainLayout from "./layout/MainLayout.tsx";
 import Profile from "./components/Profile.tsx";
 import SearchPage from "./components/SearchPage.tsx";
@@ -63,7 +63,7 @@ const appRouter = createBrowserRouter([
     path: "/",
     element: <ProtectedRoutes><MainLayout /></ProtectedRoutes>,
     children: [
-      { path: "/", element: <HeroSection /> },
+      { path: "/", element: <HomePage /> },
       { path: "/profile", element: <Profile /> },
       { path: "/search/:text", element: <SearchPage /> },
       { path: "/restaurant/:id", element: <ResturantDetails /> },
