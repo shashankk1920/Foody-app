@@ -18,4 +18,3 @@ export const generateToken =(res:Response, user:any) => {
 });
     return token;
 }       
-
