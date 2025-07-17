@@ -72,7 +72,7 @@ const Profile = () => {
       <div className="relative z-10 w-full max-w-7xl">
         <form
           onSubmit={updateProfileHandler}
-          className="my-10 p-6 bg-white rounded-lg shadow-3xl shadow-black drop-shadow-lg"
+          className="my-10 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-3xl shadow-black drop-shadow-lg transition-colors"
         >
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -82,8 +82,8 @@ const Profile = () => {
                   src={selectedProfilePicture}
                   className="w-full h-full object-cover rounded-full"
                 />
-                <AvatarFallback className="text-lg font-bold bg-gray-300 rounded-full flex items-center justify-center">
-                  CN
+                <AvatarFallback className="text-lg font-bold bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-full flex items-center justify-center">
+                  {user?.fullname?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
                 <input
                   ref={imageRef}
@@ -105,7 +105,7 @@ const Profile = () => {
   name="fullname"
   value={profileData.fullname}
   onChange={changeHandler}
-  className="text-2xl font-semibold border border-gray-300 focus:ring-2 focus:ring-orange rounded-md p-2 bg-white shadow-sm w-full"
+  className="text-2xl font-semibold border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-orange rounded-md p-2 bg-white shadow-sm w-full transition-colors"
   placeholder="Full Name"
 />
 
@@ -143,17 +143,17 @@ const Profile = () => {
             ].map(({ icon, label, name, value, disabled }) => (
               <div
                 key={name}
-                className="flex items-center gap-4 p-3 rounded-md bg-gray-100 shadow-sm"
+                className="flex items-center gap-4 p-3 rounded-md bg-gray-100 dark:bg-gray-700 shadow-sm transition-colors"
               >
                 {icon}
                 <div className="w-full">
-                  <Label className="text-gray-600 font-semibold">{label}</Label>
+                  <Label className="text-gray-600 dark:text-gray-300 font-semibold">{label}</Label>
                   <input
                     name={name}
                     value={value}
                     onChange={changeHandler}
                     disabled={disabled}
-                    className="w-full bg-transparent text-gray-700 focus:ring-2 focus:ring-orange outline-none p-2 rounded-md"
+                    className="w-full bg-transparent text-gray-700 dark:text-gray-200 focus:ring-2 focus:ring-orange outline-none p-2 rounded-md transition-colors"
                   />
                 </div>
               </div>
