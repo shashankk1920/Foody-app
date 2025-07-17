@@ -18,19 +18,24 @@ export const isAuthenticated = async (req: Request, res: Response, next: NextFun
                 message: "User not authenticated"
             });
         }
-        // verify the toekn
+        
+        // verify the token
         const decode = jwt.verify(token, process.env.SECRET_KEY!) as jwt.JwtPayload;
-        // check is decoding was successfull
+        
+        // check is decoding was successful
         if (!decode) {
             return res.status(401).json({
                 success: false,
                 message: "Invalid token"
             })
         }
+        
         req.id = decode.userId;
         next();
     } catch (error) {
+        console.error('Error in isAuthenticated middleware:', error);
         return res.status(500).json({
+            success: false,
             message: "Internal server error"
         })
     }
