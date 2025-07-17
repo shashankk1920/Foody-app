@@ -139,7 +139,8 @@ export const searchRestaurant = async (req: Request, res: Response): Promise<any
         const searchText = req.query.q as string || "";
         const selectedCuisines = (req.query.selectedCuisines as string || "")
             .split(",")
-            .filter(cuisine => cuisine.trim() !== "");
+            .map(cuisine => cuisine.trim())
+            .filter(cuisine => cuisine !== "");
 
         const query: any = {};
 
@@ -152,8 +153,37 @@ export const searchRestaurant = async (req: Request, res: Response): Promise<any
             ];
         }
 
+        // Robust case-insensitive cuisine filter: normalize both stored and selected cuisines
         if (selectedCuisines.length > 0) {
-            query.cuisines = { $in: selectedCuisines };
+            // Find all restaurants first, then filter in JS for robust matching
+            const allRestaurants = await Restaurant.find(query);
+            const selectedNormalized = selectedCuisines.map(c => c.trim().toLowerCase());
+            const filteredRestaurants = allRestaurants.filter(r => {
+                if (!Array.isArray(r.cuisines)) return false;
+                // Normalize stored cuisines
+                const storedNormalized = r.cuisines.map((c: string) => c.trim().toLowerCase());
+                // At least one selected cuisine matches stored cuisines
+                return selectedNormalized.some(sel => storedNormalized.includes(sel));
+            });
+            // Sort: exact match in restaurantName or city comes first
+            const searchTextLower = searchText.toLowerCase();
+            const sortedRestaurants = filteredRestaurants.sort((a, b) => {
+                const aExact = (
+                    a.restaurantName.toLowerCase() === searchTextLower ||
+                    a.city.toLowerCase() === searchTextLower
+                );
+                const bExact = (
+                    b.restaurantName.toLowerCase() === searchTextLower ||
+                    b.city.toLowerCase() === searchTextLower
+                );
+                if (aExact && !bExact) return -1;
+                if (!aExact && bExact) return 1;
+                return 0;
+            });
+            return res.status(200).json({
+                success: true,
+                data: sortedRestaurants
+            });
         }
 
         console.log("Search Query:", JSON.stringify(query, null, 2));
