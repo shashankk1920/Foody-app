@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAuth, forgotPassword, login, logout, resetPassword, signup, updateProfile, verifyEmail } from "../controller/user.controller";
+import { checkAuth, forgotPassword, login, logout, resetPassword, signup, updateProfile, verifyEmail, becomeAdmin } from "../controller/user.controller";
 import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
@@ -12,5 +12,6 @@ router.route("/verify-email").post(verifyEmail);
 router.route("/forgot-password").post(forgotPassword);
 router.route("/reset-password/:token").post(resetPassword);
 router.route("/profile/update").put(isAuthenticated,updateProfile);
+router.route("/become-admin").put(isAuthenticated, becomeAdmin);
 
 export default router;
