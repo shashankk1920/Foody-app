@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRestaurantStore } from "../store/useRestaurantStore";
 import { Restaurant } from "../types/restaurantTypes"; // MenuItem commented for later use
 import { Card, CardContent, CardFooter } from "./ui/card";
