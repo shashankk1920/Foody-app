@@ -199,6 +199,44 @@ export const checkAuth = async (req: Request, res: Response):Promise<any> => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+
+export const becomeAdmin = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const userId = req.id;
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID not found in request"
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId, 
+            { admin: true }, 
+            { new: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user,
+            message: "You are now an admin! You can create and manage restaurants."
+        });
+    } catch (error) {
+        console.error('Error in becomeAdmin:', error);
+        return res.status(500).json({ 
+            success: false,
+            message: "Internal server error" 
+        });
+    }
+};
+
 export const updateProfile = async (req: Request, res: Response):Promise<any> => {
     try {
         const userId = req.id;
