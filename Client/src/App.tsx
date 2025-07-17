@@ -13,6 +13,7 @@ import MainLayout from "./layout/MainLayout.tsx";
 import Profile from "./components/Profile.tsx";
 import SearchPage from "./components/SearchPage.tsx";
 import ResturantDetails from "./components/ResturantDetails.tsx";
+import AdminAccess from "./components/AdminAccess.tsx";
 
 import Cart from "./components/Cart.tsx";
 import Restaurant from "./admin/Restaurant.tsx";
@@ -20,6 +21,7 @@ import AddMenu from "./admin/AddMenu.tsx";
 import Order from "./admin/Order.tsx";
 import Succcess from "./components/Succcess.tsx";
 import { useUserStore } from "./store/useUserStore.ts";
+import { useThemeStore } from "./store/useThemeStore.ts";
 import { useEffect } from "react";
 import Loading from "./components/ui/Loading.tsx";
 import PrivacyPolicy from "./components/PrivacyPolicy.tsx";
@@ -27,6 +29,7 @@ import TermsOfService from "./components/TermsOfService.tsx";
 import ContactUs from "./components/ContactUs.tsx";
 
 
+// Route protection for authenticated users only
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
   if (!isAuthenticated) {
@@ -38,6 +41,7 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
+// Redirect authenticated users away from auth pages
 const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useUserStore();
   if (isAuthenticated && user?.isVerified) {
@@ -46,6 +50,7 @@ const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
+// Admin-only routes
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated } = useUserStore();
   if (!isAuthenticated) {
@@ -57,18 +62,21 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
-// 🆕 Public Routes moved outside protected layout
+// Public routes with main layout (browsing allowed without login)
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <ProtectedRoutes><MainLayout /></ProtectedRoutes>,
+    element: <MainLayout />,
     children: [
       { path: "/", element: <HomePage /> },
-      { path: "/profile", element: <Profile /> },
       { path: "/search/:text", element: <SearchPage /> },
       { path: "/restaurant/:id", element: <ResturantDetails /> },
-      { path: "/cart", element: <Cart /> },
-      { path: "/order/status", element: <Succcess /> },
+      { path: "/admin-access", element: <ProtectedRoutes><AdminAccess /></ProtectedRoutes> },
+      // Protected routes that require login
+      { path: "/profile", element: <ProtectedRoutes><Profile /></ProtectedRoutes> },
+      { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
+      { path: "/order/status", element: <ProtectedRoutes><Succcess /></ProtectedRoutes> },
+      // Admin routes
       {
         path: "/admin/restaurant",
         element: <AdminRoute><Restaurant /></AdminRoute>,
@@ -83,6 +91,7 @@ const appRouter = createBrowserRouter([
       },
     ],
   },
+  // Authentication routes
   {
     path: "/login",
     element: <AuthenticatedUser><Login /></AuthenticatedUser>,
@@ -103,7 +112,7 @@ const appRouter = createBrowserRouter([
     path: "/verify-email",
     element: <VerifyEmail />,
   },
-  // 🆕 These are now accessible without login
+  // Public pages
   {
     path: "/privacy-policy",
     element: <PrivacyPolicy />,
@@ -120,10 +129,18 @@ const appRouter = createBrowserRouter([
 
 function App() {
   const { checkAuthentication, isCheckingAuth } = useUserStore();
+  const { setTheme } = useThemeStore();
 
   useEffect(() => {
     checkAuthentication();
-  }, [checkAuthentication]);
+    
+    // Initialize theme
+    const storedTheme = localStorage.getItem("vite-ui-theme") as "light" | "dark" | null;
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const themeToApply = storedTheme || systemTheme;
+    
+    setTheme(themeToApply);
+  }, [checkAuthentication, setTheme]);
 
   if (isCheckingAuth) return <Loading />;
 
