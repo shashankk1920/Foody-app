@@ -10,7 +10,12 @@ export const generateToken =(res:Response, user:any) => {
     const token = jwt.sign({userId:user._id}, process.env.SECRET_KEY!, {expiresIn:'1d'});
    
 
-    res.cookie("token", token, {httpOnly:true, sameSite:'none',  secure: process.env.NODE_ENV === "production",maxAge: 86400000});
+   res.cookie("token", token, {
+  httpOnly: true,
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: process.env.NODE_ENV === "production",
+  maxAge: 86400000
+});
     return token;
 }       
 
