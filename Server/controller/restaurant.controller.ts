@@ -47,10 +47,10 @@ export const getRestaurant = async (req: Request, res: Response):Promise<any> =>
     try {
         const restaurant = await Restaurant.findOne({ user: req.id }).populate('menus');
         if (!restaurant) {
-            return res.status(404).json({
-                success: false,
-                restaurant:[],
-                message: "Restaurant not found"
+            return res.status(200).json({
+                success: true,
+                restaurant: null,
+                message: "No restaurant found for this user"
             })
         };
         return res.status(200).json({ success: true, restaurant });
