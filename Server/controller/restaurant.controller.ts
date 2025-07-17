@@ -159,9 +159,26 @@ export const searchRestaurant = async (req: Request, res: Response): Promise<any
         console.log("Search Query:", JSON.stringify(query, null, 2));
 
         const restaurants = await Restaurant.find(query);
+
+        // Sort: exact match in restaurantName or city comes first
+        const searchTextLower = searchText.toLowerCase();
+        const sortedRestaurants = restaurants.sort((a, b) => {
+            const aExact = (
+                a.restaurantName.toLowerCase() === searchTextLower ||
+                a.city.toLowerCase() === searchTextLower
+            );
+            const bExact = (
+                b.restaurantName.toLowerCase() === searchTextLower ||
+                b.city.toLowerCase() === searchTextLower
+            );
+            if (aExact && !bExact) return -1;
+            if (!aExact && bExact) return 1;
+            return 0;
+        });
+
         return res.status(200).json({
             success: true,
-            data: restaurants
+            data: sortedRestaurants
         });
     } catch (error) {
         console.error("Search Error:", error);
