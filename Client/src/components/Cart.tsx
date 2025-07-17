@@ -25,7 +25,7 @@ const Cart = () => {
     removeFromTheCart,
   } = useCartStore();
 
-  const totalAmount = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalAmount = cart?.reduce((acc, item) => acc + (item.price || 0) * (item.quantity || 1), 0) || 0;
 
   const formatNumber = (amount: number) =>
     new Intl.NumberFormat("en-US", {
@@ -47,7 +47,7 @@ const Cart = () => {
       <div className="relative z-10 max-w-7xl mx-auto bg-white bg-opacity-90 p-6 rounded-xl shadow-lg">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
           <h2 className="text-3xl font-bold text-center sm:text-left">Shopping Cart</h2>
-          {cart.length > 0 && (
+          {cart?.length > 0 && (
             <Button
               variant="destructive"
               onClick={() => {
@@ -63,7 +63,7 @@ const Cart = () => {
           )}
         </div>
 
-        {cart.length === 0 ? (
+        {!cart || cart.length === 0 ? (
           <div className="text-center py-20 text-gray-500 text-xl">
             Your cart is empty.
           </div>
@@ -83,16 +83,16 @@ const Cart = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cart.map((item: CartItem) => (
+                  {cart?.map((item: CartItem) => (
                     <TableRow key={item._id} className="hover:bg-gray-50">
                       <TableCell>
                         <Avatar className="w-14 h-14">
-                          <AvatarImage src={item.image} alt={item.name} />
-                          <AvatarFallback>{item.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                          <AvatarImage src={item.image} alt={item.name || "Menu Item"} />
+                          <AvatarFallback>{item.name ? item.name.slice(0, 2).toUpperCase() : "MI"}</AvatarFallback>
                         </Avatar>
                       </TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{formatNumber(item.price)}</TableCell>
+                      <TableCell className="font-medium">{item.name || "Unknown Item"}</TableCell>
+                      <TableCell>{formatNumber(item.price || 0)}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Button
@@ -103,7 +103,7 @@ const Cart = () => {
                           >
                             <Minus size={16} />
                           </Button>
-                          <span className="w-8 text-center font-medium">{item.quantity}</span>
+                          <span className="w-8 text-center font-medium">{item.quantity || 1}</span>
                           <Button
                             onClick={() => incrementQuantity(item._id)}
                             size="icon"
@@ -114,7 +114,7 @@ const Cart = () => {
                           </Button>
                         </div>
                       </TableCell>
-                      <TableCell>{formatNumber(item.price * item.quantity)}</TableCell>
+                      <TableCell>{formatNumber((item.price || 0) * (item.quantity || 1))}</TableCell>
                       <TableCell className="text-right">
                         <Button
                           size="sm"
