@@ -19,7 +19,7 @@ const FeaturedSection = () => {
   //   city?: string;
   //   deliveryTime?: number;
   // })[]>([]); // Commented for later use
-  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     // Fetch all restaurants to show featured ones
