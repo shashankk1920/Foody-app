@@ -4,8 +4,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { toast } from "sonner";
 import { MenuItem, RestaurantState } from "../types/restaurantTypes";
 import { Orders } from "../types/orderType";
-
-const API_END_POINT = "https://foody-app-v86b.onrender.com/api/v1/restaurant"; // For local development
+const API_END_POINT = import.meta.env.DEV
+  ? "http://localhost:3000/api/v1/restaurant"
+  : "https://foody-app-v86b.onrender.com/api/v1/restaurant"; // For local development
 axios.defaults.withCredentials = true;
 
 export const useRestaurantStore = create<RestaurantState >()(
@@ -73,16 +74,12 @@ export const useRestaurantStore = create<RestaurantState >()(
 
       // Search restaurants
       searchRestaurant: async (searchText: string, searchQuery: string, selectedCuisines: String[]) => {
-      
         try {
             set({ loading: true });
-
             const params = new URLSearchParams();
-            params.set("searchQuery", searchQuery);
+            params.set("q", searchQuery || searchText);
             params.set("selectedCuisines", selectedCuisines.join(","));
-
-            // await new Promise((resolve) => setTimeout(resolve, 2000));
-            const response = await axios.get(`${API_END_POINT}/search/${searchText}?${params.toString()}`);
+            const response = await axios.get(`${API_END_POINT}/search?${params.toString()}`);
             if (response.data.success) {
                 set({ loading: false, searchedRestaurant: response.data });
             }
