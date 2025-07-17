@@ -47,9 +47,8 @@ export const useRestaurantStore = create<RestaurantState >()(
             set({ restaurant: response.data.restaurant });
           }
         } catch (error: any) {
-          if (error.response?.status === 404) {
-            set({ restaurant: null });
-          }
+          console.error('Error fetching restaurant:', error);
+          set({ restaurant: null });
         } finally {
           set({ loading: false });
         }
@@ -115,13 +114,17 @@ export const useRestaurantStore = create<RestaurantState >()(
       },
 
       // Apply a filter
-      setAppliedFilter: (value: string) => {
+      setAppliedFilter: (value: string | string[]) => {
         set((state) => {
-          const isAlreadyApplied = state.appliedFilter.includes(value);
-          const updatedFilter = isAlreadyApplied
-            ? state.appliedFilter.filter((item) => item !== value)
-            : [...state.appliedFilter, value];
-          return { appliedFilter: updatedFilter };
+          if (Array.isArray(value)) {
+            return { appliedFilter: value };
+          } else {
+            const isAlreadyApplied = state.appliedFilter.includes(value);
+            const updatedFilter = isAlreadyApplied
+              ? state.appliedFilter.filter((item) => item !== value)
+              : [...state.appliedFilter, value];
+            return { appliedFilter: updatedFilter };
+          }
         });
       },
 
