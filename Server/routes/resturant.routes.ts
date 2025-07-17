@@ -22,9 +22,13 @@ router.route("/order").get(isAuthenticated, getRestaurantOrder);
 router.route("/order/:orderId/status").put(isAuthenticated, updateOrderStatus);
 
 // Use query parameters for search instead of path parameter
-router.route("/search").get(isAuthenticated, searchRestaurant);
-
+router.route("/search").get(searchRestaurant);
+//router.get("/search", isAuthenticated, searchRestaurant);
+//i will uuse it when i will have to ben authneticatef
 // Keep this at the end to avoid route conflicts
 router.route("/:id").get(isAuthenticated, getSingleRestaurant);
 
 export default router;
+
+
+
