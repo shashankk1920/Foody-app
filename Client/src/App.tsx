@@ -27,6 +27,7 @@ import Loading from "./components/ui/Loading.tsx";
 import PrivacyPolicy from "./components/PrivacyPolicy.tsx";
 import TermsOfService from "./components/TermsOfService.tsx";
 import ContactUs from "./components/ContactUs.tsx";
+import NotFound from "./components/NotFound.tsx";
 
 
 // Route protection for authenticated users only
@@ -136,6 +137,11 @@ const appRouter = createBrowserRouter([
   {
     path: "/contact-us",
     element: <ContactUs />,
+  },
+  // Catch-all route for 404 pages
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
 
