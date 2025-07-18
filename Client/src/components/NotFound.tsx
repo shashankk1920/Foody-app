@@ -73,7 +73,7 @@ const NotFound = () => {
               Popular Pages
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Link to="/search/restaurants">
+              <Link to="/search/all">
                 <Button 
                   variant="ghost" 
                   className="w-full hover:bg-orange-50 hover:text-orange-600 transition-colors"
