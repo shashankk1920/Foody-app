@@ -68,7 +68,8 @@ const FeaturedSection = () => {
   // };
 
   const handleViewAllRestaurants = () => {
-    navigate("/search/restaurants");
+    // Navigate to search page to show all restaurants
+    navigate("/search/all");
   };
 
   // const handleExploreDishes = () => {
