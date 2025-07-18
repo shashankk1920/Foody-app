@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect} from "react";
 import { useRestaurantStore } from "../store/useRestaurantStore";
 import { Restaurant } from "../types/restaurantTypes"; // MenuItem commented for later use
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -19,7 +19,7 @@ const FeaturedSection = () => {
   //   city?: string;
   //   deliveryTime?: number;
   // })[]>([]); // Commented for later use
-
+ 
 
   useEffect(() => {
     // Fetch all restaurants to show featured ones
