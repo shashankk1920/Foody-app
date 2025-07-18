@@ -142,10 +142,10 @@ export const useRestaurantStore = create<RestaurantState >()(
           }
         } catch (error: any) {
           console.error('Error fetching restaurant details:', error);
-          if (error.response?.status === 401) {
-            toast.error("Authentication required to view restaurant details");
-          } else if (error.response?.status === 404) {
+          if (error.response?.status === 404) {
             toast.error("Restaurant not found");
+          } else if (error.response?.status === 500) {
+            toast.error("Server error occurred while fetching restaurant details");
           } else {
             toast.error(error.response?.data?.message || "Failed to fetch the restaurant details");
           }
