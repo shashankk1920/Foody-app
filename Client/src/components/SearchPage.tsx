@@ -24,7 +24,9 @@ const SearchPage = () => {
   } = useRestaurantStore();
 
   useEffect(() => {
-    searchRestaurant(params.text!, searchQuery, appliedFilter);
+    // If the search term is "all", pass empty string to show all restaurants
+    const searchTerm = params.text === "all" ? "" : params.text!;
+    searchRestaurant(searchTerm, searchQuery, appliedFilter);
     console.log("Updated searchedRestaurant state:", searchedRestaurant);
   }, [params.text!,searchQuery,appliedFilter]);
 
@@ -42,9 +44,11 @@ const SearchPage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Button
-              onClick={() =>
-                searchRestaurant(params.text!, searchQuery, appliedFilter)
-              }
+              onClick={() => {
+                // If the search term is "all", pass empty string to show all restaurants
+                const searchTerm = params.text === "all" ? "" : params.text!;
+                searchRestaurant(searchTerm, searchQuery, appliedFilter);
+              }}
               className="bg-orange hover:bg-hoverOrange"
             >
               Search
@@ -54,7 +58,7 @@ const SearchPage = () => {
           <div>
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2 my-3">
               <h1 className="font-medium text-lg">
-                ({searchedRestaurant?.data?.length}) Search result found
+                ({searchedRestaurant?.data?.length}) {params.text === "all" ? "Restaurant" : "Search result"}{searchedRestaurant?.data?.length !== 1 ? "s" : ""} found
               </h1>
               <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
                 {appliedFilter.map(
@@ -195,14 +199,18 @@ const SearchPageSkeleton = () => {
 };
 
 const NoResultFound = ({ searchText }: { searchText: string }) => {
+  const isShowingAll = searchText === "all";
+  
   return (
     <div className="text-center">
       <h1 className="text-2xl font-semibold text-gray-700 dark:text-gray-200">
-        No results found
+        {isShowingAll ? "No restaurants available" : "No results found"}
       </h1>
       <p className="mt-2 text-gray-500 dark:text-gray-400">
-        We couldn't find any results for "{searchText}". <br /> Try searching
-        with a different term.
+        {isShowingAll 
+          ? "There are currently no restaurants available. Please check back later."
+          : `We couldn't find any results for "${searchText}". Try searching with a different term.`
+        }
       </p>
       <Link to="/">
         <Button className="mt-4 bg-orange hover:bg-orangeHover">
