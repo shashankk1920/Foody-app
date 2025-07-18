@@ -139,15 +139,27 @@ export const useRestaurantStore = create<RestaurantState >()(
           const response = await axios.get(`${API_END_POINT}/${restaurantId}`);
           if (response.data.success) {
             set({ singleRestaurant: response.data.restaurant });
+          } else {
+            toast.error("Unable to load restaurant details");
+            set({ singleRestaurant: null });
           }
         } catch (error: any) {
           console.error('Error fetching restaurant details:', error);
           if (error.response?.status === 404) {
             toast.error("Restaurant not found");
-          } else if (error.response?.status === 500) {
-            toast.error("Server error occurred while fetching restaurant details");
+          } else if (error.response?.status >= 500) {
+            toast.error("Server is currently unavailable. Please try again later.");
+          } else if (error.response?.data?.message) {
+            // Only show server message if it's not authentication related
+            const errorMessage = error.response.data.message;
+            if (!errorMessage.toLowerCase().includes('authenticated') && 
+                !errorMessage.toLowerCase().includes('authorization')) {
+              toast.error(errorMessage);
+            } else {
+              toast.error("Unable to load restaurant details");
+            }
           } else {
-            toast.error(error.response?.data?.message || "Failed to fetch the restaurant details");
+            toast.error("Unable to load restaurant details");
           }
           set({ singleRestaurant: null });
         }
