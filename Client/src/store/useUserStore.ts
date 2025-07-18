@@ -53,11 +53,17 @@ export const useUserStore = create<UserState>()(persist((set) => ({
             });
             if (response.data.success) { 
                 toast.success(response.data.message);
-                set({ loading: false, user: response.data.user, isAuthenticated: true });
+                // Set user as authenticated but not verified
+                set({ 
+                    loading: false, 
+                    user: response.data.user, 
+                    isAuthenticated: true 
+                });
             }
         } catch (error: any) {
             toast.error(error.response.data.message);
             set({ loading: false });
+            throw error; // Re-throw to handle in component
         }
     },
 
@@ -89,11 +95,17 @@ export const useUserStore = create<UserState>()(persist((set) => ({
             });
             if (response.data.success) {
                 toast.success(response.data.message);
-                set({ loading: false, user: response.data.user, isAuthenticated: true });
+                set({ 
+                    loading: false, 
+                    user: response.data.user, 
+                    isAuthenticated: true 
+                });
+                // Navigation will happen automatically due to route protection
             }
         } catch (error: any) {
             toast.error(error.response.data.message);
             set({ loading: false });
+            throw error; // Re-throw to handle in component
         }
     },
     checkAuthentication: async () => {
