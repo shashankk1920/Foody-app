@@ -50,6 +50,18 @@ const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
+// Route protection for verification page
+const VerificationRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, user } = useUserStore();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.isVerified) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
 // Admin-only routes
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated } = useUserStore();
@@ -110,7 +122,7 @@ const appRouter = createBrowserRouter([
   },
   {
     path: "/verify-email",
-    element: <VerifyEmail />,
+    element: <VerificationRoute><VerifyEmail /></VerificationRoute>,
   },
   // Public pages
   {
@@ -134,10 +146,11 @@ function App() {
   useEffect(() => {
     checkAuthentication();
     
-    // Initialize theme
+    // Initialize theme - Default to light mode for first-time visitors
     const storedTheme = localStorage.getItem("vite-ui-theme") as "light" | "dark" | null;
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const themeToApply = storedTheme || systemTheme;
+    
+    // If user has a stored preference, use it. Otherwise, default to light mode
+    const themeToApply = storedTheme || "light";
     
     setTheme(themeToApply);
   }, [checkAuthentication, setTheme]);
