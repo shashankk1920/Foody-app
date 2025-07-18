@@ -29,9 +29,9 @@ const RestaurantDetail = () => {
           <div className="my-5">
             <h1 className="font-medium text-xl">{singleRestaurant?.restaurantName || "Loading..."}</h1>
             <div className="flex gap-2 my-2">
-              {singleRestaurant?.cuisines.map((cuisine: string, idx: number) => (
+              {singleRestaurant?.cuisines?.map((cuisine: string, idx: number) => (
                 <Badge key={idx}>{cuisine}</Badge>
-              ))}
+              )) || null}
             </div>
             <div className="flex md:flex-row flex-col gap-2 my-5">
               <div className="flex items-center gap-2">
