@@ -32,7 +32,20 @@ import NotFound from "./components/NotFound.tsx";
 
 // Route protection for authenticated users only
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user } = useUserStore();
+  const { isAuthenticated, user, isCheckingAuth, loading } = useUserStore();
+  
+  // Show loading spinner while checking authentication
+  if (isCheckingAuth || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
