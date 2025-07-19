@@ -5,7 +5,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { useRestaurantStore } from "./useRestaurantStore";
 
 
-const API_END_POINT ="https://foody-app-v86b.onrender.com/api/v1/menu";
+// Smart environment detection
+const API_END_POINT = window.location.hostname === 'localhost' 
+  ? "http://localhost:3000/api/v1/menu"
+  : "https://foody-app-v86b.onrender.com/api/v1/menu";
 axios.defaults.withCredentials = true;
 
 
