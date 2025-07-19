@@ -4,9 +4,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { toast } from "sonner";
 import { MenuItem, RestaurantState } from "../types/restaurantTypes";
 import { Orders } from "../types/orderType";
-const API_END_POINT = import.meta.env.DEV
+// Smart environment detection
+const API_END_POINT = window.location.hostname === 'localhost' 
   ? "http://localhost:3000/api/v1/restaurant"
-  : "https://foody-app-v86b.onrender.com/api/v1/restaurant"; // For local development
+  : "https://foody-app-v86b.onrender.com/api/v1/restaurant";
 axios.defaults.withCredentials = true;
 
 export const useRestaurantStore = create<RestaurantState >()(
