@@ -81,10 +81,12 @@ export const useUserStore = create<UserState>()(persist((set) => ({
             if (response.data.success) { 
                 toast.success(response.data.message);
                 set({ loading: false, user: response.data.user, isAuthenticated: true });
+                return; // Success - no error thrown
             }
         } catch (error: any) {
             toast.error(error.response.data.message);
             set({ loading: false });
+            throw error; // Re-throw the error so Login component can catch it
         }
     },
     verifyEmail: async (verificationCode: string) => {
