@@ -2,9 +2,13 @@ import { CheckoutSessionRequest, OrderState } from "../types/orderType";
 import axios from "axios";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { toast } from "sonner";
 
 
-const API_END_POINT = "https://foody-app-v86b.onrender.com/api/v1/order"; // Updated to use HTTP for local development
+// Smart environment detection
+const API_END_POINT = window.location.hostname === 'localhost' 
+  ? "http://localhost:3000/api/v1/order"
+  : "https://foody-app-v86b.onrender.com/api/v1/order";
 axios.defaults.withCredentials = true; 
 
 export const useOrderStore = create<OrderState>()(persist((set => ({
@@ -17,9 +21,11 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
         const response = await axios.post(
           `${API_END_POINT}/checkout/create-checkout-session`,
           checkoutSession,
-          { headers: { 'Content-Type': 'application/json' } }
+          { 
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 15000
+          }
         );
-        console.log("Stripe session response:", response.data);
 
         if (!response.data?.session?.url) {
           throw new Error("Stripe session URL is missing in the response.");
@@ -27,27 +33,30 @@ export const useOrderStore = create<OrderState>()(persist((set => ({
 
         window.location.href = response.data.session.url;
       } catch (error: any) {
-        console.error("Stripe Checkout Error:", error.response?.data || error.message);
-        alert("Something went wrong during checkout. Please try again.");
+        if (error.code === 'ECONNABORTED') {
+          toast.error("Request timeout. Please check your connection and try again.");
+        } else if (error.response) {
+          toast.error(`Server error: ${error.response.data?.message || error.response.data?.error || 'Unknown error'}`);
+        } else if (error.request) {
+          toast.error("No response from server. Please check if the server is running.");
+        } else {
+          toast.error(`Something went wrong: ${error.message}`);
+        }
       } finally {
         set({ loading: false });
       }
     },
    getOrderDetails: async () => {
-  try {
-    set({ loading: true });
-
-    // ✅ Actual API call
-    const response = await axios.get(`${API_END_POINT}/`);
-    set({ orders: response.data.orders });
-
-  } catch (error: any) {
-    console.error("Get Order Details Error:", error.response?.data || error.message);
-    alert("Something went wrong while fetching order details.");
-  } finally {
-    set({ loading: false });
+    try {
+      set({ loading: true });
+      const response = await axios.get(`${API_END_POINT}/`);
+      set({ orders: response.data.orders });
+    } catch (error: any) {
+      toast.error("Something went wrong while fetching order details.");
+    } finally {
+      set({ loading: false });
+    }
   }
-}
 
 })), {
     name: 'order-name',
