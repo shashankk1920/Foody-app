@@ -30,8 +30,31 @@ import ContactUs from "./components/ContactUs.tsx";
 import NotFound from "./components/NotFound.tsx";
 
 
-// Route protection for authenticated users only
+// Route protection for authenticated users only (requires login but not verification)
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isCheckingAuth, loading } = useUserStore();
+  
+  // Show loading spinner while checking authentication
+  if (isCheckingAuth || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
+
+// Route protection for verified users only (requires both login and verification)
+const VerifiedRoutes = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user, isCheckingAuth, loading } = useUserStore();
   
   // Show loading spinner while checking authentication
@@ -57,10 +80,13 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
 
 // Redirect authenticated users away from auth pages
 const AuthenticatedUser = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, user } = useUserStore();
-  if (isAuthenticated && user?.isVerified) {
+  const { isAuthenticated } = useUserStore();
+  
+  // If user is authenticated (logged in), redirect them away from auth pages
+  if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
+  
   return children;
 };
 
@@ -76,11 +102,14 @@ const VerificationRoute = ({ children }: { children: React.ReactNode }) => {
   return children;
 };
 
-// Admin-only routes
+// Admin-only routes (requires login, verification, and admin status)
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated } = useUserStore();
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  if (!user?.isVerified) {
+    return <Navigate to="/verify-email" replace />;
   }
   if (!user?.admin) {
     return <Navigate to="/" replace />;
@@ -97,11 +126,12 @@ const appRouter = createBrowserRouter([
       { path: "/", element: <HomePage /> },
       { path: "/search/:text", element: <SearchPage /> },
       { path: "/restaurant/:id", element: <ResturantDetails /> },
-      { path: "/admin-access", element: <ProtectedRoutes><AdminAccess /></ProtectedRoutes> },
-      // Protected routes that require login
+      { path: "/admin-access", element: <VerifiedRoutes><AdminAccess /></VerifiedRoutes> },
+      // Protected routes that require login only (not verification)
       { path: "/profile", element: <ProtectedRoutes><Profile /></ProtectedRoutes> },
       { path: "/cart", element: <ProtectedRoutes><Cart /></ProtectedRoutes> },
-      { path: "/order/status", element: <ProtectedRoutes><Succcess /></ProtectedRoutes> },
+      // Routes that require verification
+      { path: "/order/status", element: <VerifiedRoutes><Succcess /></VerifiedRoutes> },
       // Admin routes
       {
         path: "/admin/restaurant",
