@@ -8,6 +8,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { toast } from "sonner";
 import { Button } from "./ui/button";
 import { useUserStore } from "../store/useUserStore";
 import { CheckoutSessionRequest } from "../types/orderType";
@@ -24,7 +25,7 @@ const CheckoutConfirmPage = ({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const { user } = useUserStore();
+  const { user, isAuthenticated } = useUserStore();
   const [input, setInput] = useState({
     name: user?.fullname || "",
     email: user?.email || "",
@@ -33,19 +34,60 @@ const CheckoutConfirmPage = ({
     city: user?.city || "",
     country: user?.country || "",
   });
-  const { cart } = useCartStore();
-  const { restaurant } = useRestaurantStore();
+  const { cart, clearCart } = useCartStore();
+  const { singleRestaurant } = useRestaurantStore();
   const { createCheckoutSession, loading } = useOrderStore();
+  
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
   };
   const checkoutHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Check authentication first
+    if (!isAuthenticated) {
+      toast.error("You need to be logged in to place an order. Please log in and try again.");
+      return;
+    }
+    
+    // Validate that we have a restaurant selected
+    if (!singleRestaurant?._id) {
+      toast.error("Restaurant information is missing. Please try again.");
+      return;
+    }
+    
+    // Check if cart is empty
+    if (!cart || cart.length === 0) {
+      toast.error("Your cart is empty. Please add items to cart before checkout.");
+      return;
+    }
+    
+    // Validate cart items belong to current restaurant
+    const validCartItems = cart.filter(cartItem => {
+      return singleRestaurant.menus?.some((menu: any) => menu._id === cartItem._id);
+    });
+    
+    if (validCartItems.length === 0) {
+      const shouldClearCart = confirm("No valid items found in cart for this restaurant. This might happen if you added items from a different restaurant. Would you like to clear your cart and start fresh?");
+      if (shouldClearCart) {
+        clearCart();
+        toast.success("Cart cleared. Please add items from the current restaurant.");
+      }
+      return;
+    }
+    
+    if (validCartItems.length !== cart.length) {
+      const invalidCount = cart.length - validCartItems.length;
+      if (!confirm(`${invalidCount} item(s) in your cart are not available from this restaurant and will be excluded. Continue with ${validCartItems.length} valid item(s)?`)) {
+        return;
+      }
+    }
+    
     // api implementation start from here
     try {
       const checkoutData: CheckoutSessionRequest = {
-        cartItems: cart.map((cartItem) => ({
+        cartItems: validCartItems.map((cartItem) => ({
           menuId: cartItem._id,
           name: cartItem.name,
           image: cartItem.image,
@@ -53,11 +95,12 @@ const CheckoutConfirmPage = ({
           quantity: cartItem.quantity.toString(),
         })),
         deliveryDetails: input,
-        restaurantId: restaurant?._id as string,
+        restaurantId: singleRestaurant._id,
       };
+      
       await createCheckoutSession(checkoutData);
     } catch (error) {
-      console.log(error);
+      toast.error("Error during checkout. Please try again.");
     }
   };
 
