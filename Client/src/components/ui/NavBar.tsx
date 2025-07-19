@@ -152,7 +152,7 @@ const NavBar = () => {
               <div className="flex items-center gap-3">
                 <Link
                   to="/login"
-                  className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-md px-6 py-2 shadow-md text-base transition-all"
+                  className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white rounded-md px-6 py-2 shadow-md w-full sm:w-auto text-base sm:text-lg"
                 >
                   Login
                 </Link>
