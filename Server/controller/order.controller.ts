@@ -10,14 +10,16 @@ type CheckoutSessionRequest = {
         menuId: string;
         name: string;
         image: string;
-        price: number;
-        quantity: number
+        price: string | number;
+        quantity: string | number
     }[],
     deliveryDetails: {
         name: string;
         email: string;
+        contact?: string;
         address: string;
-        city: string
+        city: string;
+        country?: string
     },
     restaurantId: string
 }
@@ -37,13 +39,11 @@ export const getOrders = async (req: Request, res: Response) => {
 
 export const createCheckoutSession = async (req: Request, res: Response): Promise<any> => {
   try {
-    console.log("➡️ createCheckoutSession called");
     const checkoutSessionRequest: CheckoutSessionRequest = req.body;
-    console.log("🛒 Checkout Session Request:", checkoutSessionRequest);
 
     const restaurant = await Restaurant.findById(checkoutSessionRequest.restaurantId).populate('menus');
+    
     if (!restaurant) {
-      console.log("❌ Restaurant not found");
       return res.status(404).json({
         success: false,
         message: "Restaurant not found."
@@ -54,7 +54,6 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
 
     // Create line items for Stripe
     const lineItems = createLineItems(checkoutSessionRequest, menuItems);
-    console.log("✅ Line Items Created:", lineItems);
 
     // Calculate total amount in paise (smallest currency unit)
     const totalAmount = lineItems.reduce(
@@ -76,11 +75,20 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
       restaurant: restaurant._id,
       user: req.id,
       deliveryDetails: checkoutSessionRequest.deliveryDetails,
-      cartItems: checkoutSessionRequest.cartItems,
+      cartItems: checkoutSessionRequest.cartItems.map(item => ({
+        ...item,
+        price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+        quantity: typeof item.quantity === 'string' ? parseInt(item.quantity) : item.quantity
+      })),
       status: "pending",
-      totalAmount: totalAmount / 100, // convert back to rupees if your schema expects INR in rupees, else keep paise
+      totalAmount: totalAmount / 100,
     });
 
+    // Determine the frontend URL based on environment
+    const frontendUrl = process.env.NODE_ENV === 'production' 
+      ? process.env.FRONTEND_URL 
+      : 'http://localhost:5173';
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       shipping_address_collection: {
@@ -88,8 +96,8 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
       },
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL}/order/status`,
-      cancel_url: `${process.env.FRONTEND_URL}/cart`,
+      success_url: `${frontendUrl}/order/status`,
+      cancel_url: `${frontendUrl}/cart`,
       metadata: {
         orderId: newOrder._id.toString(),
         images: JSON.stringify(menuItems.map((item: any) => item.image))
@@ -97,17 +105,18 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
     });
 
     if (!session.url) {
-      console.log("❌ Stripe session URL missing");
       return res.status(400).json({ success: false, message: "Error while creating session" });
     }
 
     await newOrder.save();
-    console.log("✅ Order Saved");
 
     return res.status(200).json({ session });
-  } catch (error) {
-    console.error("❌ Stripe Checkout Error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+  } catch (error: any) {
+    console.error("Stripe Checkout Error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error"
+    });
   }
 };
 
@@ -165,23 +174,31 @@ export const stripeWebhook = async (req: Request, res: Response):Promise<any> =>
 
 
 export const createLineItems = (checkoutSessionRequest: CheckoutSessionRequest, menuItems: any) => {
-    // 1. create line items
-    const lineItems = checkoutSessionRequest.cartItems.map((cartItem) => {
-        const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
-        if (!menuItem) throw new Error(`Menu item id not found`);
+    // Create line items - filter out invalid items instead of throwing error
+    const validLineItems = checkoutSessionRequest.cartItems
+        .map((cartItem) => {
+            const menuItem = menuItems.find((item: any) => item._id.toString() === cartItem.menuId);
+            if (!menuItem) {
+                return null;
+            }
 
-        return {
-            price_data: {
-                currency: 'inr',
-                product_data: {
-                    name: menuItem.name,
-                    images: [menuItem.image],
+            return {
+                price_data: {
+                    currency: 'inr',
+                    product_data: {
+                        name: menuItem.name,
+                        images: [menuItem.image],
+                    },
+                    unit_amount: menuItem.price * 100
                 },
-                unit_amount: menuItem.price * 100
-            },
-            quantity: cartItem.quantity,
-        }
-    })
-    // 2. return lineItems
-    return lineItems;
+                quantity: typeof cartItem.quantity === 'string' ? parseInt(cartItem.quantity) : cartItem.quantity,
+            }
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null);
+    
+    if (validLineItems.length === 0) {
+        throw new Error("No valid menu items found in cart for this restaurant");
+    }
+    
+    return validLineItems;
 }
