@@ -4,9 +4,11 @@ import axios from "axios";
 import { LoginInputState, SignupInputState } from "../schema/userSchema";
 import { toast } from "sonner";
 
-const API_END_POINT = import.meta.env.DEV
+// Smart environment detection
+const API_END_POINT = window.location.hostname === 'localhost' 
   ? "http://localhost:3000/api/v1/user"
-  : "https://foody-app-v86b.onrender.com/api/v1/user";// Updated to use HTTP for local development
+  : "https://foody-app-v86b.onrender.com/api/v1/user";
+
 axios.defaults.withCredentials = true;
 
 type User = {
