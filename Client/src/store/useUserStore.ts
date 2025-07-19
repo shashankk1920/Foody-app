@@ -187,16 +187,16 @@ export const useUserStore = create<UserState>()(persist((set) => ({
             });
             if (response.data.success) {
                 toast.success(response.data.message);
-                set({ user: response.data.user, isAuthenticated: true, loading: false });
+                // Ensure admin is true in frontend state
+                const updatedUser = { ...response.data.user, admin: true };
+                set({ user: updatedUser, isAuthenticated: true, loading: false });
             }
         } catch (error: any) {
             console.error('Become admin error:', error);
-            
             if (error.response) {
                 // Server responded with error status
                 console.error('Error response:', error.response.data);
                 console.error('Error status:', error.response.status);
-                
                 if (error.response.data?.message) {
                     toast.error(error.response.data.message);
                 } else {
@@ -211,7 +211,6 @@ export const useUserStore = create<UserState>()(persist((set) => ({
                 console.error('Error:', error.message);
                 toast.error('An unexpected error occurred');
             }
-            
             set({ loading: false });
         }
     }
