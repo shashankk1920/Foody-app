@@ -26,7 +26,7 @@ router.route("/search").get(searchRestaurant);
 //router.get("/search", isAuthenticated, searchRestaurant);
 //i will uuse it when i will have to ben authneticatef
 // Keep this at the end to avoid route conflicts
-router.route("/:id").get(isAuthenticated, getSingleRestaurant);
+router.route("/:id").get(getSingleRestaurant);
 
 export default router;
 
