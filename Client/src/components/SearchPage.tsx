@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useDebounce } from "../lib/useDebounce";
 import { useRestaurantStore } from "../store/useRestaurantStore";
 import FilterPage from "./FilterPage";
 import { Input } from "./ui/input";
@@ -14,6 +15,9 @@ import { Restaurant } from "../types/restaurantTypes";
 const SearchPage = () => {
   const params = useParams();
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const debouncedSearch = useDebounce((searchTerm: string, query: string, filters: string[]) => {
+    searchRestaurant(searchTerm, query, filters);
+  }, 400);
   
   const {
     loading,
@@ -23,7 +27,7 @@ const SearchPage = () => {
     appliedFilter,
   } = useRestaurantStore();
 
- useEffect(() => {
+  useEffect(() => {
     // If the search term is "all", pass empty string to show all restaurants
     const searchTerm = params.text === "all" ? "" : params.text!;
     debouncedSearch(searchTerm, searchQuery, appliedFilter);
@@ -84,10 +88,10 @@ const SearchPage = () => {
               </div>
             </div>
             {/* Restaurant Cards  */}
-            <div  className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               {loading ? (
                 <SearchPageSkeleton />
-              ) : !loading && searchedRestaurant?.data?.length === 0 ? (
+              ) : !loading && (!searchedRestaurant?.data || searchedRestaurant?.data.length === 0) ? (
                 <NoResultFound searchText={params.text!} />
               ) : (
                 searchedRestaurant?.data?.map((restaurant: Restaurant) => (
@@ -116,17 +120,13 @@ const SearchPage = () => {
                       <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
                         <MapPin size={16} />
                         <p className="text-sm">
-                          City:{" "}
-                          <span className="font-medium">{restaurant.city}</span>
+                          City: <span className="font-medium">{restaurant.city}</span>
                         </p>
                       </div>
                       <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
                         <Globe size={16} />
                         <p className="text-sm">
-                          Country:{" "}
-                          <span className="font-medium">
-                            {restaurant.country}
-                          </span>
+                          Country: <span className="font-medium">{restaurant.country}</span>
                         </p>
                       </div>
                       <div className="flex gap-2 mt-4 flex-wrap">
