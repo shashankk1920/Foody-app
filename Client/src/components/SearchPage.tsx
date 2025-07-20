@@ -23,12 +23,12 @@ const SearchPage = () => {
     appliedFilter,
   } = useRestaurantStore();
 
-  useEffect(() => {
+ useEffect(() => {
     // If the search term is "all", pass empty string to show all restaurants
     const searchTerm = params.text === "all" ? "" : params.text!;
-    searchRestaurant(searchTerm, searchQuery, appliedFilter);
-    console.log("Updated searchedRestaurant state:", searchedRestaurant);
-  }, [params.text!,searchQuery,appliedFilter]);
+    debouncedSearch(searchTerm, searchQuery, appliedFilter);
+    // console.log("Updated searchedRestaurant state:", searchedRestaurant);
+  }, [params.text!, searchQuery, appliedFilter]);
 
   return (
     <div className="max-w-7xl mx-auto my-10">
