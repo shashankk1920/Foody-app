@@ -12,7 +12,7 @@ import HomePage from "./components/HomePage.tsx";
 import MainLayout from "./layout/MainLayout.tsx";
 import Profile from "./components/Profile.tsx";
 import SearchPage from "./components/SearchPage.tsx";
-import ResturantDetails from "./components/ResturantDetails.tsx";
+import RestaurantDetails from "./components/RestaurantDetails.tsx";
 import AdminAccess from "./components/AdminAccess.tsx";
 
 import Cart from "./components/Cart.tsx";
@@ -125,7 +125,7 @@ const appRouter = createBrowserRouter([
     children: [
       { path: "/", element: <HomePage /> },
       { path: "/search/:text", element: <SearchPage /> },
-      { path: "/restaurant/:id", element: <ResturantDetails /> },
+      { path: "/restaurant/:id", element: <RestaurantDetails /> },
       { path: "/admin-access", element: <VerifiedRoutes><AdminAccess /></VerifiedRoutes> },
       // Protected routes that require login only (not verification)
       { path: "/profile", element: <ProtectedRoutes><Profile /></ProtectedRoutes> },
