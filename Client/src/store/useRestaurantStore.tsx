@@ -6,8 +6,8 @@ import { MenuItem, RestaurantState } from "../types/restaurantTypes";
 import { Orders } from "../types/orderType";
 // Smart environment detection
 const API_END_POINT = window.location.hostname === 'localhost' 
-  ? "http://localhost:3000/api/v1/resturant"
-  : "https://foody-app-v86b.onrender.com/api/v1/resturant";
+  ? "http://localhost:3000/api/v1/restaurant"
+  : "https://foody-app-v86b.onrender.com/api/v1/restaurant";
 axios.defaults.withCredentials = true;
 
 export const useRestaurantStore = create<RestaurantState >()(
