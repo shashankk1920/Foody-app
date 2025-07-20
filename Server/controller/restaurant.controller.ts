@@ -186,7 +186,6 @@ export const searchRestaurant = async (req: Request, res: Response): Promise<any
             });
         }
 
-        console.log("Search Query:", JSON.stringify(query, null, 2));
 
         const restaurants = await Restaurant.find(query);
 
