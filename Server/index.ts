@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRoutes from "./routes/user.routes";
-import restauntRoutes from "./routes/resturant.routes";
+import restauntRoutes from "./routes/restaurant.routes";
 import menuRoutes from "./routes/menu.route";
 import orderRoute from "./routes/order.route";
 
