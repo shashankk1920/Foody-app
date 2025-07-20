@@ -1,3 +1,15 @@
+export const getMenus = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const menus = await Menu.find();
+        return res.status(200).json({
+            success: true,
+            menus
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
 import { Request, Response } from "express";
 import uploadImageOnCloudinary from "../utils/imageUpload";
 import {Menu} from "../models/menu.model";
