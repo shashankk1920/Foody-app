@@ -30,11 +30,11 @@ const HeroSection = () => {
         {/* Text Section */}
         <div className="flex flex-col gap-5 w-full md:w-[50%] md:ml-7 text-center md:text-left">
           <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl text-gray-100 drop-shadow-[1px_1px_0px_black]">
-            Order Food Anytime and Anywhere
+Satisfy Your Cravings, Anytime, Anywhere
           </h1>
 
           <p className="font-semibold text-sm sm:text-base md:text-xl md:font-extrabold text-gray-100 drop-shadow-[1px_1px_0px_black]">
-            Hey! Our Delicious food is waiting for you, we are always near to you
+          Fresh, delicious meals delivered to your doorstep whenever you want.
           </p>
 
           <div className="relative flex flex-col sm:flex-row items-center gap-3 w-full">
@@ -72,3 +72,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
